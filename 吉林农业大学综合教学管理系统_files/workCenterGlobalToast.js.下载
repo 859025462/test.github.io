@@ -1,0 +1,415 @@
+$(function(){
+    let lastDownloadInfoTimer = setInterval(()=>{
+        top.window.getLastDownloadInfo()
+    },5050)// 略微比5000ms多一点，防止误差
+})
+
+
+
+window.addEventListener('message', function(event) {
+    if (event.data.type === 'workCenterExport') {
+        const {url,queryParams,positionObj,gridId,searchPostData} = event.data
+        top.window.topWinWorkCenterExport(url, queryParams, positionObj,gridId,searchPostData)
+    }
+});
+
+window.addEventListener('message', function(event) {
+    if (event.data.type === 'workCenterTipsToast') {
+        let {toastContent,iconClass,goUrl,downloadJson,placeClass,removeTimer} = event.data
+        // 请选择要导出的数据
+        top.window.topWinworkCenterGlobalMsg(toastContent,iconClass,goUrl,downloadJson,placeClass,removeTimer)
+    }
+});
+
+// 专门给弹窗中的导出使用
+top.window.topWinWorkCenterExport = function(url, param, positionObj, gridId, searchPostData) {
+    top.layer.load(2);
+    if(searchPostData){
+        console.log(searchPostData,param);
+        if(typeof param === 'object'){
+            Object.assign(param, searchPostData);
+        }else if(typeof param === 'string'){
+            let paramObj = {};
+            param.split("&").forEach(pair => {
+                let [key, value] = pair.split("=");
+                paramObj[decodeURIComponent(key)] = decodeURIComponent(value);
+            });
+            Object.assign(paramObj, searchPostData);
+            param = $.param(paramObj)
+        }
+    }
+    $.ajax({
+        url: url,
+        data: param,
+        type: "post",
+        success: function (res) {
+            top.layer.close(top.layer.load(2));
+            if(top.window.hasWorkCenter){
+                if (res.ret === 0) {
+                    //新任务 动画
+                    top.window.topWinExportAnimation(positionObj)
+                    top.window.topWinworkCenterGlobalMsg('您有一个文件已开始导出', '', '/workcenter/homepage/list?center=download')
+                } else if (res.ret === 1) {
+                    // 重复任务正在进行中
+                    top.window.topWinworkCenterGlobalMsg('任务导出中', '', '/workcenter/homepage/list?center=download')
+                } else if (res.ret === 2) {
+                    // 这个任务已经完成
+                    top.window.topWinworkCenterGlobalMsg('导出已完成', '', '/workcenter/homepage/list?center=download')
+                } else if(res.ret === 4){
+                    top.window.topWinworkCenterGlobalMsg('请选择要导出的数据')
+                } else {
+                    top.window.topWinworkCenterGlobalMsg(res.msg || '操作失败,请重试')
+                }
+            }else{
+                if (res.ret === 0) {
+                    top.window.topWinworkCenterGlobalMsg('您有一个文件已开始导出，请在导出记录中查看')
+                } else if (res.ret === 1) {
+                    // 重复任务正在进行中
+                    top.window.topWinworkCenterGlobalMsg('任务导出中，请在导出记录中查看')
+                } else if (res.ret === 2) {
+                    // 这个任务已经完成
+                    top.window.topWinworkCenterGlobalMsg('导出已完成，请在导出记录中查看')
+                } else {
+                    top.window.topWinworkCenterGlobalMsg(res.msg || '操作失败,请重试')
+                }
+            }
+        },
+        error(err) {
+            top.layer.close(top.layer.load(2));
+            top.window.topWinworkCenterGlobalMsg('操作失败,请重试')
+        }
+    });
+
+    if(gridId){
+        top.window[`${gridId}_exportParam`] = param
+    }
+}
+
+// 专门给弹窗中的导出使用
+top.window.topWinExportAnimation = function(positionObj) {
+    // 先对于屏幕的位置，这个位置就不用考虑iframe影响了
+    let topDocument = top.window.document
+    let topBody = topDocument.body || topDocument.getElementsByTagName('body')[0];
+    let $workCenterInfo = $(topBody).find('.workCenterInfo')
+    if ($workCenterInfo.length > 0) {
+        // 调用right-info.jsp中全局定义的handleWorkCenterMsg
+        top.window.handleWorkCenterMsg && top.window.handleWorkCenterMsg()
+        if (positionObj && !(positionObj.x === 0 && positionObj.y === 0)) {
+            let {x, y} = positionObj
+            let {left: offsetLeft, top: offsetTop} = $workCenterInfo.offset()
+
+            let $movingElement = $(`<div class="work-ani-pointer"></div>`)
+            $movingElement.css({
+                position: 'fixed',
+                top: y + 'px',
+                left: x + 'px',
+                // opacity: 1,
+            })
+            $(topBody).append($movingElement)
+            $movingElement.animate(
+                {
+                    top: offsetTop + 30,
+                    left: offsetLeft,
+                    // opacity: 0
+                },
+                2000,
+                'swing',
+                function () {
+                    // viewMsgNumAdd()
+                    $workCenterInfo.find('.work-center-icon .icon').animate({
+                        'zoom': '1.5'
+                    }, 500, function () {
+                        $workCenterInfo.find('.work-center-icon .icon').animate({
+                            'zoom': '1'
+                        }, 500)
+                    })
+                    $movingElement.remove();
+                }
+            )
+        }
+    }
+}
+
+// 专门给弹窗中的导出使用
+top.window.topWinGetDomPositionInTopWindow = function(domEle) {
+    var left = 0;
+    var top = 0;
+    let curWindow = window
+    let curBody = curWindow.document.body
+    let flag = false
+    while (domEle) {
+        let {x, y} = domEle.getBoundingClientRect();
+        left += x
+        top += y
+        let curIframe = curWindow.frameElement
+        if (curIframe) {
+            let {x: iframeX, y: iframeY} = curIframe.getBoundingClientRect();
+            left += iframeX
+            top += iframeY
+        }
+        curWindow = curWindow.parent
+        curBody = curWindow.document.body
+        if (curBody === window.top.document.body) {
+            break;
+            // if(flag){
+            // }else{
+            //     flag = true
+            // }
+        }
+    }
+
+    return {x: left, y: top};
+}
+
+// 专门给弹窗中的导出使用
+top.window.topWinworkCenterGlobalMsg = function(msgText, iconClass = '', goUrl,downloadJson,placeClass,removeTimer) {
+    placeClass = placeClass || 'center'
+    removeTimer = removeTimer || 3000
+    let topDocument = top.window.document
+    let topBody = topDocument.body || topDocument.getElementsByTagName('body')[0];
+    // 请确保这个adminPath有正确值
+    // let adminPath = $('#adminPath').val()
+    let adminPath = $(topBody).find('#adminPath').val()
+    let linkHtml = ''
+    if(goUrl){
+        let href = adminPath + goUrl
+        linkHtml = `<a class="view-detail" target="_blank" href="${href}">查看</a>`
+    }
+    let downLinkHtml = ''
+    if(downloadJson){
+        downLinkHtml = `<a class="download-btn" download-json='${downloadJson}' onclick="downloadByJson(this)">下载</a>`
+    }
+    // success warning
+    let $msgDom = $(`
+        <div class="global-tip-msg ${iconClass} ${placeClass}">
+            <div class="tips-icon"></div>
+            <div class="tips-text">${msgText}</div>
+            ${linkHtml}
+            ${downLinkHtml}
+        </div>
+    `)
+    let globalMsgLength = $(top.document.body).children(`.global-tip-msg.${placeClass}`).length
+    $msgDom.css({
+        top: 80 + (globalMsgLength) * (48 + 10) + 'px',
+    })
+    $(top.document.body).append($msgDom)
+    let curTimer = top.window.setTimeout(() => {
+        let $nextAllMsg = $msgDom.nextAll(`.global-tip-msg.${placeClass}`)
+        $msgDom.remove()
+        // 每当有一个删除时，将其 后面的消息元素位置都网上提一位
+        $nextAllMsg.each(function () {
+            let offsetTop = $(this).offset().top
+            if(offsetTop > 80){
+                $(this).animate({
+                    "top": offsetTop - 58 + 'px'
+                }, 500)
+            }
+        })
+    }, removeTimer)
+    $msgDom.on('mouseenter', function () {
+        top.window.clearTimeout(curTimer)
+        curTimer = top.window.setTimeout(() => {
+            $msgDom.remove()
+        }, removeTimer)
+    })
+    $msgDom.on('mouseleave', function () {
+        curTimer = top.window.setTimeout(() => {
+            // 需要往前移动一位的消息袁旭
+            let $nextAllMsg = $msgDom.nextAll(`.global-tip-msg.${placeClass}`)
+            $msgDom.remove()
+            $nextAllMsg.each(function () {
+                let offsetTop = $(this).offset().top
+                if(offsetTop > 80){
+                    $(this).animate({
+                        "top": offsetTop - 58 + 'px'
+                    }, 500)
+                }
+            })
+        }, removeTimer)
+    })
+}
+
+top.window.globalCreateToast = function(toastText,iconClass,goUrl,downloadJson,placeClass,removeTimer){
+    top.window.postMessage({
+        type: 'workCenterTipsToast',
+        toastContent: toastText || '提示消息',
+        iconClass: iconClass || '',
+        goUrl: goUrl || '',
+        downloadJson: downloadJson || '',
+        placeClass: placeClass || '',
+        removeTimer: removeTimer || 3000,
+    }, '*');
+}
+
+// 全局黑化弹窗
+top.window.showGlobalMaskLayer = function() {
+    var J_mainContent =  document.getElementsByClassName('J_mainContent')[0].children
+    var findIframe = ''
+    for (let index = 0; index < J_mainContent.length; index++) {
+        if (J_mainContent[index].style.display != 'none') {
+            findIframe = J_mainContent[index]
+        }
+    }
+    if (findIframe) {
+        $(findIframe).addClass('globalMaskLayer')
+        if ($('.leftNav').css('left') == '-193px') {
+            $(findIframe).addClass('p-l-20')
+        } else if ($('.leftNav').css('left') == '20px') {
+            $(findIframe).addClass('p-l-225')
+        } else {
+            $(findIframe).addClass('p-l-212')
+        }
+    }
+    return $('.leftNav').css('left')
+}
+
+top.window.removeGlobalMaskLayer = function() {
+    var J_mainContent =  document.getElementsByClassName('J_mainContent')[0].children
+    var findIframe = ''
+    for (let index = 0; index < J_mainContent.length; index++) {
+        if (J_mainContent[index].style.display != 'none') {
+            findIframe = J_mainContent[index]
+        }
+    }
+    if (findIframe) {
+        $(findIframe).removeClass('globalMaskLayer')
+        if ($('.leftNav').css('left') == '-193px') {
+            $(findIframe).removeClass('p-l-20')
+        } else if ($('.leftNav').css('left') == '20px') {
+            $(findIframe).removeClass('p-l-225')
+        } else {
+            $(findIframe).removeClass('p-l-212')
+        }
+    }
+}
+
+//获取cookie
+top.window.getCookie = function (name){
+    var arr, reg = new RegExp("(^| )*" + name + "=([^;]*)(;|$)");
+    if (arr = document.cookie.match(reg)) {
+        return decodeURIComponent(arr[2]);
+    } else {
+        return '';
+    }
+}
+
+var loadingKey = 'jw_download_info_loading';//是否正在加载中
+var resultKey = 'jw_download_info_result';//上一次结果
+var lastTimeKey = 'jw_download_info_last_time';//上一次请求时间
+
+// 获取最近的下载中心的信息，可能是导出成功或者失败
+top.window.getLastDownloadInfo = function(){
+    if (!top.window.getCookie('jw_uf')) {// 未登录
+        return;
+    }
+    if (!top.window.getCookie('jw_download_info_task')) { //启用下载中心任务标记
+        return;
+    }
+    var loading = localStorage.getItem(loadingKey);
+    var lastTime = localStorage.getItem(lastTimeKey);
+    if (!lastTime || Date.now() - parseInt(lastTime) > 15000) {
+        localStorage.removeItem(loadingKey);
+    }
+    if (loading || (lastTime && Date.now() - parseInt(lastTime) < 5000)) { // 正在加载中或5秒以内的重复请求读取本地结果
+        var result = localStorage.getItem(resultKey);
+        if (result) {
+            top.window.parseDownloadInfo(JSON.parse(result));
+        }
+        return;
+    }
+    let url = $('#adminPath').val() + '/workcenter/download/getLastDownloadInfo';
+    localStorage.setItem(loadingKey, "1");
+    localStorage.setItem(lastTimeKey, '' + Date.now());// 设置请求时间
+    $.ajax({
+        type: "GET",
+        url: url,
+        data: {},
+        success: function (res) {
+            localStorage.removeItem(loadingKey);// 结束移除加载状态
+            if (res) {
+                top.window.parseDownloadInfo(res);// 解析结果
+                localStorage.setItem(resultKey, JSON.stringify(res));
+            }
+        }
+    });
+}
+
+// 处理接口返回值
+top.window.parseDownloadInfo = function (res) {
+    if(res.ret === 0){
+        let goUrl = '/workcenter/homepage/list?center=download'
+        const data = res.data
+        if(data && data.succeList && data.succeList.length > 0){
+            let succeList = data.succeList
+            let toastText = ''
+            if(succeList.length > 1){
+                toastText = `${succeList[0].filename}等${succeList.length}个文件 导出成功`
+            }else{
+                toastText = `${succeList[0].filename} 导出成功`
+            }
+            let downloadJson = JSON.stringify(succeList)
+            top.window.globalCreateToast(toastText,'success',goUrl,downloadJson,'right',5000)
+        }
+        if(data && data.failList && data.failList.length > 0){
+            let failList = data.failList
+            let toastText = ''
+            if(failList.length > 1){
+                toastText = `${failList[0].filename}等${failList.length}个文件 导出失败`
+            }else{
+                toastText = `${failList[0].filename} 导出失败`
+            }
+            top.window.globalCreateToast(toastText,'warning',goUrl,'','right',5000)
+        }
+    }
+}
+
+top.window.downloadByJson = function(_self){
+    let downloadJson = $(_self).attr('download-json')
+    if(downloadJson){
+        let dataArr = JSON.parse(downloadJson)
+        if(dataArr.length === 1){
+            const {filename,objectid,sjly} = dataArr[0]
+            window.location.href = $("#adminPath").val()+`/system/attachment/downLoadFileByObjId?filename=${filename}&objId=${objectid}&sjly=${sjly}`;
+        }else{
+            let ids = dataArr.map(item => item.id)
+            $.ajax({
+                type: "post",
+                url: $('#adminPath').val() + '/workcenter/download/tempSaveParam',
+                data: {
+                    ids: ids.join(',')
+                },
+                success: function (res) {
+                    const { ret,data } = res
+                    if(ret === 0){
+                        window.location.href = $("#adminPath").val()+`/workcenter/download/exportByZip?tempid=${data}`;
+                    }
+                }
+            });
+        }
+
+    }
+}
+
+// 立即执行函数防止数据污染，只能通过函数进行修改获取
+;(function () {
+    var globalTempData = null // 全局暂存区数据，只用于某个操作阶段的暂存（或某个页面给某个页面传个数据），用完之后清空掉，不可依赖该数据
+    // 全局设置暂存区数据
+    top.window.setGlobalTempData = function (data = null) {
+        globalTempData = data
+    }
+    // 全局清除暂存区数据
+    top.window.clearGlobalTempData = function () {
+        globalTempData = null
+    }
+    // 全局获取暂存区数据
+    top.window.getGlobalTempData = function () {
+        return globalTempData
+    }
+    top.window.addEventListener('message', function(event) {
+        if (['globalCustomExport', 'global_custom_export'].includes(event.data.type)) {
+            var jwUtils = new JwUtils()
+            jwUtils.customExportData(top.window.getGlobalTempData())
+            top.window.clearGlobalTempData()
+        }
+    });
+})()

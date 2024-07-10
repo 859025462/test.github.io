@@ -1,0 +1,684 @@
+class JwUtils {
+    constructor() {
+        this.renderTipTimer = null
+        // 采用新报表参数的单位
+        this.useNewReportParamUnit = ['dev', 'jwys', 'cqzhxy','jw_user']
+    }
+    // 时间戳转 年:月:日 时:分:秒
+    formatTime(time, type = true) {
+        var date = new Date(Number(time)); // 创建一个Date对象，参数为时间戳
+        var year = date.getFullYear(); // 年份
+        var month = date.getMonth() + 1; // 月份，注意需要加1，月份从0开始
+        var day = date.getDate(); // 日
+        var hour = date.getHours(); // 小时
+        var minute = date.getMinutes(); // 分钟
+        var second = date.getSeconds(); // 秒
+        var nyr = `${year}-${month > 9 ? month : '0' + month}-${day > 9 ? day : '0' + day}`
+        var sfm = `${hour > 9 ? hour : '0' + hour}:${minute > 9 ? minute : '0' + minute}:${second > 9 ? second : '0' + second}`
+        return type ? nyr + ' ' + sfm : nyr
+    }
+    // 时间戳转 年:月:日 时:分
+    formatTimeToMinute(time, noSplit = false) {
+        var date = new Date(Number(time)); // 创建一个Date对象，参数为时间戳
+        var year = date.getFullYear(); // 年份
+        var month = date.getMonth() + 1; // 月份，注意需要加1，月份从0开始
+        var day = date.getDate(); // 日
+        var hour = date.getHours(); // 小时
+        var minute = date.getMinutes(); // 分钟
+        var second = date.getSeconds(); // 秒
+        var nyr = `${year}-${month > 9 ? month : '0' + month}-${day > 9 ? day : '0' + day}`
+        var sf = `${hour > 9 ? hour : '0' + hour}:${minute > 9 ? minute : '0' + minute}`
+        return noSplit ? `${year}${month > 9 ? month : '0' + month}${day > 9 ? day : '0' + day}${hour > 9 ? hour : '0' + hour}${minute > 9 ? minute : '0' + minute}` : nyr + ' ' + sf
+    }
+    // 判空
+    isEmpty(obj) {
+        if (typeof obj == "undefined" || obj == null || obj == "") {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    IsArray (list) {
+        return Object.prototype.toString.call(list) === '[object Array]'
+    }
+    getUrlParam(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return decodeURI(r[2]);
+        return '';
+    }
+    /**
+     * // 反转layer的确定与取消按钮
+     * @param {index} index 弹窗index
+     * @param {boolean} isJwlayer 使用的是否是jwlayer 默认为false
+     */
+    reverseLayerBtn(index, isJwlayer = false) {
+        var prefix = isJwlayer ? 'jw' : ''
+        var targetDom = top.window.document.querySelector(`#layui-${prefix}layer${index} .layui-${prefix}layer-btn`)
+        var childNodes = top.window.document.querySelector(`#layui-${prefix}layer${index} .layui-${prefix}layer-btn`).childNodes
+        targetDom.insertBefore(childNodes[1], childNodes[0])
+        $(childNodes[1]).css({
+            height: '32px',
+            lineHeight: '34px',
+            padding: '0px 20px',
+            backgroundColor: '#3A8BFF'
+        })
+        $(childNodes[0]).css({
+            height: '32px',
+            lineHeight: '34px',
+            border: '1px solid #8CBBFF',
+            padding: '0px 20px',
+            color: '#3A8BFF'
+        })
+    }
+    // 表格列自适应宽度
+    adjustTdWidth() {
+        // 使用闭包的形式将合适的宽度给存起来,如果有了就不需要再进行计算了,也防止宽度不受控,因为下面给scrollWidth做了加10处理
+        var suitableWidth = {}
+        return function ({ gridId, field }) {
+            $(`#${gridId}Grid`).bind("jqGridLoadComplete", function (e, data) {
+                var fields = field.split(',')
+                var tempObj = {}
+                if ($(`#${gridId}Grid`).find("tr") && $(`#${gridId}Grid`).find("tr").length <= 1) {
+                    return
+                }
+                fields.forEach(item => {
+                    var maxWidth = 0
+                    tempObj[item] = {}
+                    suitableWidth[item] = suitableWidth[item] ? suitableWidth[item] : {}
+                    if (!suitableWidth[item].maxWidth) {
+                        $(`#gbox_${gridId}Grid`).find(`td[aria-describedby='${gridId}Grid_${item}']`).each(function (index, dom) {
+                            // 获取最宽一个元素的滚动宽度
+                            maxWidth = dom.scrollWidth > maxWidth ? dom.scrollWidth : maxWidth
+                        })
+                    }
+                    // 如果没数据初始化宽度为200
+                    maxWidth = maxWidth == 0 ? 200 : maxWidth
+                    suitableWidth[item].maxWidth = suitableWidth[item].maxWidth ? suitableWidth[item].maxWidth : maxWidth + 10
+                    $($(`#${gridId}Grid`).find("tr")[$(`#${gridId}Grid`).find("tr").length - 1]).find("td").each(function (index, dom) {
+                        // 获取操作列的索引
+                        if ($(dom).attr("aria-describedby") == `${gridId}Grid_${item}`) {
+                            tempObj[item].OptIndex = index
+                        }
+                    })
+                    $(`#gbox_${gridId}Grid`).find(`th[id='${gridId}Grid_${item}']`).css({
+                        // 操作宽度
+                        width: suitableWidth[item].maxWidth ? suitableWidth[item].maxWidth + 'px' : (maxWidth + 10 + 'px')
+                    })
+                    //  操作表头th宽度
+                    if ($(`#gbox_${gridId}Grid`).find('.jqgfirstrow').children()[tempObj[item].OptIndex]) {
+                        $(`#gbox_${gridId}Grid`).find('.jqgfirstrow').children()[tempObj[item].OptIndex].style.width = suitableWidth[item].maxWidth ? suitableWidth[item].maxWidth + 'px' : (maxWidth + 10 + 'px')
+                    }
+                })
+            });
+        }
+    }
+    /**
+     * 为了在系统打开前端fe项目地址, 使用方法
+     * ${pageContext.request.contextPath}/jwUtils.currentEnt()/#/gradeManagement/GradeDetails
+    */
+    currentEnt() {
+        var URL = ''
+        var host = top.window.location.host
+        /**
+           jwgl.dlvtc.edu.cn
+           教务管理.大连科技.教育.cn
+         */
+        // 公网定制域名 因定制域名在第二个,所以取第二个
+        var PublicNetworkCustomizedDomainNameSecondChar = ['jwgl.dlvtc.edu.cn']
+        if (host.indexOf('chaoxing') > -1) {
+            URL = '/fe-' + host.split('.')[0]
+        } else {
+            if (PublicNetworkCustomizedDomainNameSecondChar.includes(host)) {
+                URL = '/fe-' + host.split('.')[1]
+            } else {
+                URL = '/fe'
+            }
+        }
+        return URL
+    }
+    debounce(func, delay) {
+        let timer
+        return function () {
+            if (timer) clearTimeout(timer)
+            timer = setTimeout(() => {
+                func()
+            }, delay)
+        }
+    }
+    returnQueryParamsWithSelected(gridId, shortGridId) {
+        var queryParams = {};
+        var queryFields = $('#' + gridId + "Query").val();
+        queryParams[gridId + "Query"] = queryFields;
+        //普通的查询
+        $('#' + gridId + "Query").find(":input").each(
+            function () {
+                var val = $(this).val();
+                if (val != null && val != '') {
+                    val = val.toString();
+                }
+                if (queryParams[$(this).attr('name')]) {
+                    val = queryParams[$(this).attr('name')] + ","
+                        + $(this).val();
+                }
+                queryParams[$(this).attr('name')] = val;
+            });
+        //获取勾选记录
+        var ids = SelectList;
+        if (ids != undefined && ids.length > 0) {
+            var key0 = "ids";
+            queryParams[key0] = ids.toString();
+        }
+        // 是否全选与未选ids，isAllSel、noSelIds
+        let isAllSel = window['selectAll_' + shortGridId]
+        let noSelIds = ''
+        if (Array.isArray(window['noSelList_' + shortGridId])) {
+            noSelIds = window['noSelList_' + shortGridId].join(',')
+        }
+        queryParams['isAllSel'] = isAllSel
+        queryParams['noSelIds'] = noSelIds
+        //刷新
+        return queryParams;
+    }
+    /**
+     * 获取该表格，所有被选中的数据
+     * @param {string} gridName // grid:grid 的id
+     * @param {array} selectedIds // 取SelectList
+     * @returns 
+     */
+    getSelectData (gridName, selectedIds) {
+        var data = []
+        if (selectedIds.length) {
+            data = selectedIds.map(item => $("#" + gridName + 'Grid').jqGrid('getRowData', item))
+        }
+        return data
+    }
+    getDomPositionInTopWindow(domEle) {
+        var left = 0;
+        var top = 0;
+        let curWindow = window
+        let curBody = curWindow.document.body
+        while (domEle) {
+          let {x, y} = domEle.getBoundingClientRect();
+          left += x
+          top += y
+          let curIframe = curWindow.frameElement
+          if (curIframe) {
+            let {x: iframeX, y: iframeY} = curIframe.getBoundingClientRect();
+            left += iframeX
+            top += iframeY
+          }
+          curWindow = curWindow.parent
+          curBody = curWindow.document.body
+          if (curBody === window.top.document.body) {
+            break;
+          }
+        }
+  
+        return {x: left, y: top};
+    }
+    /**
+     * 自定义字段导出函数
+     * @param {string} gridId 导出表格的gridId
+     * @param {string} exportUrl 导出的url
+     * @param {string} module 所属模块 规则为 大模块+该功能名称 eg: 学籍管理的学生基本信息 XJGL_XSJBXX  
+     * @param {string} placeholder 导出默认名字 一般为 该菜单名
+     * @param {string} modalName 弹窗名
+     * @param {array} selectList 取SelectList， 被选中的ids
+     * @param {array} additionalFields 额外加入的字段
+     * @param {object} queryData 可自定义导出参数条件值
+     * @param {boolean} async 是同步导出还是异步导出 同步导出的话使用form表单提交方式
+     * @param {boolean} toDownloadCenter 是否为对接下载中心导出
+     * @param {boolean}  inculdeHiddenCode 导出字段中是否要隐藏的字段，默认为不要
+     * @param {boolean} hiddenHeader 是否隐藏导出头部，包含导出文件类型和文件名称功能
+     * @param {boolean} hiddenFileType 是否隐藏导出文件类型功能
+     * @param {boolean} hiddenFileName 是否隐藏文件名称功能
+     * @param {boolean} hiddenSuffix 是否隐藏文件时间和后缀
+     * @param {string} contextPath "${pageContext.request.contextPath}"
+     * @param {function} exportCallBack 导出功能有些模块不一致 可以自己来写
+     * @param {string} enctype 导出接口的content-type 默认为'multipart/form-data'，还有'x-www-form-urlencoded'的情况
+     * @param {boolean} sfyxdc 未勾选数据时 是否给提示 然后不允许导出 默认不给
+     * @param {boolean} isFromVue3 是否来自于vue3进行导出的
+     * @param {object} vue3JsonData isFromVue3为true时，这个必须传 {colModals: [], formState: {}, sort: '', order: ''} 这四个参数为必需值
+     */
+    customExportData ({
+        gridId, 
+        exportUrl, 
+        module, 
+        placeholder, 
+        modalName, 
+        selectList = [], 
+        additionalFields = {},
+        queryData = {}, 
+        async = false, 
+        hiddenHeader = false,
+        hiddenFileType = false,
+        hiddenFileName = false,
+        toDownloadCenter = false,
+        inculdeHiddenCode = false,
+        hiddenSuffix = false,
+        sfyxdc = false,
+        contextPath = '', 
+        exportCallBack = '',
+        enctype = 'multipart/form-data',
+        isFromVue3 = false,
+        vue3JsonData = {}
+    }) {
+        var additionalFieldsParams = Object.keys(additionalFields).map(function(key) {
+            return encodeURIComponent(key) + '=' + encodeURIComponent(additionalFields[key]);
+        }).join('&');
+        var that = this
+        var urlParams = `?gridId=${gridId}&exportUrl=${exportUrl}&module=${module}&placeholder=${placeholder}&hiddenHeader=${hiddenHeader}&hiddenFileType=${hiddenFileType}&hiddenSuffix=${hiddenSuffix}&hiddenFileName=${hiddenFileName}&${additionalFieldsParams}`;
+        var jwIndex = top.jwlayer.open({
+            type: 2,
+            area: ['75%', '700px'],
+            title: modalName,
+            maxmin: true, //开启最大化最小化按钮
+            content: contextPath + '/frontend/views/admin/customExport/index.html' + urlParams,
+            btn: ['确定', '关闭'],
+            success: function (layero, index) {
+                var iframeWin = layero.find('iframe')[0];
+                if (isFromVue3) {
+				    iframeWin.contentWindow.vm.setColModel(vue3JsonData.colModals)
+                } else {
+                    var colModal = $(`#${gridId}Grid`).jqGrid().getGridParam("colModel")
+                    if (!inculdeHiddenCode) { // 过滤掉字段设置中隐藏的字段
+                        colModal = colModal.filter(i => !i.hidden)
+                    }
+                    iframeWin.contentWindow.vm.setColModel(colModal)
+                }
+            },
+            btn1: function(index, layero) {
+                top.jwlayer.close(index)
+            },
+            btn2: function(index, layero) {
+                var iframeWin = layero.find('iframe')[0];
+                iframeWin.contentWindow.vm.updateSelectedCodes()
+                var eventTarget = layero.find('.layui-jwlayer-btn').children()[1]
+
+                var selectedFileds = iframeWin.contentWindow.vm.selectedList
+                var unselectedFileds = iframeWin.contentWindow.vm.unselectedList
+                var fileType = iframeWin.contentWindow.vm.fileType
+                var filePrefix = iframeWin.contentWindow.vm.filePrefix || placeholder
+                var fileSuffix = iframeWin.contentWindow.vm.fileSuffix || that.formatTimeToMinute(Date.now(), true)
+                var filename = filePrefix + fileSuffix
+                // 选取筛选条件，并将需额外加入的参数加到条件中
+                var formState = {} 
+                if (isFromVue3) {
+                    formState = vue3JsonData.formState
+                } else {
+                    $('#' + gridId + "GridQuery").find(":input").each(function () {
+                        var inputName = $(this).attr('name')
+                        var inputValue = $(this).val()
+                        if (inputName) {
+                            formState[inputName] = Array.isArray(inputValue) ? inputValue.join(',') : inputValue
+                        }
+                    })
+                }
+                formState = {...formState, ...queryData}
+
+                // 获取表格排序规则
+                var sort = isFromVue3 ? vue3JsonData.sort : $("#" + gridId + 'Grid').jqGrid('getGridParam', 'sortname')
+
+                // 获取表格排序字段
+                var order = isFromVue3 ? vue3JsonData.order : $("#" + gridId + 'Grid').jqGrid('getGridParam', 'sortorder')
+
+                // 选中的数据ids
+                var ids = selectList.join(',')
+
+                if (sfyxdc && selectedFileds && selectedFileds.length == 0) {
+                  top.layer.alert("您未勾选导出字段，无法生成导出文件，请勾选对应的导出字段");
+                  return;
+                }
+                var params = {
+                    ...formState,
+                    sort,
+                    order,
+                    ids,
+                    fields: selectedFileds.map(i => i.key).join(','),
+                    unSelected: unselectedFileds.map(i => i.key).join(','),
+                    fileType: fileType,
+                    filePrefix: filePrefix,
+                    fileSuffix: fileSuffix,
+                    filename: filename
+                }
+
+                // 如果有自定义导出的话，就执行该函数
+                if (typeof exportCallBack === 'function') {
+                    exportCallBack(params, eventTarget)
+                    setTimeout(() => {
+                        top.jwlayer.close(index)
+                    }, 300)
+                    return false
+                }
+
+                if (toDownloadCenter) {
+                    let positionObj = top.window.topWinGetDomPositionInTopWindow(eventTarget)
+                    top.window.postMessage({
+                        gridId: gridId,
+                        type: 'workCenterExport',
+                        url: exportUrl,
+                        queryParams: params,
+                        positionObj: positionObj
+                    }, '*');
+                    setTimeout(() => {
+                        top.jwlayer.close(index)
+                        top.jwlayer.msg('正在导出中，请稍后', {icon: 1})
+                    }, 300)
+                    return false
+                }
+                if (!async) {
+                    var tempForm = $(`<form method='post' enctype=${enctype}></form>`);
+                    tempForm.attr("action", exportUrl);
+                    $(document.body).append(tempForm);
+                    for (let key in params) {
+                        var tempInput = $("<input>");
+                        tempInput.attr("type", "hidden");
+                        tempInput.attr("name", key);
+                        tempInput.attr("value", params[key]);
+                        tempForm.append(tempInput);
+                    }
+                    tempForm.submit();
+                    $(tempForm).remove()
+                    setTimeout(() => {
+                        top.jwlayer.close(index)
+                        top.jwlayer.msg('正在导出中，请稍后', {icon: 1})
+                    }, 300)
+                } else {
+                    $.ajax({
+                        url: exportUrl,
+                        data: params,
+                        type: "post",
+                        success: function (res) {
+                            top.jwlayer.close(index)
+                            top.jwlayer.msg(res.msg, {icon: 1}) 
+                        }
+                    })
+                }
+                return false
+            }
+        });
+        this.reverseLayerBtn(jwIndex, true)
+    }
+    /**
+     * 转换阿拉伯数字为中文数字
+     * @param {*} num 
+     * @returns string
+     */
+    convertToChinaNum(num) {
+        var arr1 = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
+        var arr2 = ['', '十', '百', '千', '万', '十', '百', '千', '亿', '十', '百', '千','万', '十', '百', '千','亿'];//可继续追加更高位转换值
+        if(!num || isNaN(num)){
+            return "零";
+        }
+        var english = num.toString().split("")
+        var result = "";
+        for (var i = 0; i < english.length; i++) {
+            var des_i = english.length - 1 - i;//倒序排列设值
+            result = arr2[i] + result;
+            var arr1_index = english[des_i];
+            result = arr1[arr1_index] + result;
+        }
+        //将【零千、零百】换成【零】 【十零】换成【十】
+        result = result.replace(/零(千|百|十)/g, '零').replace(/十零/g, '十');
+        //合并中间多个零为一个零
+        result = result.replace(/零+/g, '零');
+        //将【零亿】换成【亿】【零万】换成【万】
+        result = result.replace(/零亿/g, '亿').replace(/零万/g, '万');
+        //将【亿万】换成【亿】
+        result = result.replace(/亿万/g, '亿');
+        //移除末尾的零
+        result = result.replace(/零+$/, '')
+        //将【零一十】换成【零十】
+        //result = result.replace(/零一十/g, '零十');//貌似正规读法是零一十
+        //将【一十】换成【十】
+        result = result.replace(/^一十/g, '十');
+        return result;
+    }
+    /**
+     * 解决ySelect多选赋值 赋上值但没被选中问题
+     * @param {*} id dom ID
+     * @param {*} arr 值
+     * @param {*} maxNum 超过多少时，折叠
+     */
+    setSelectedStatus (id, arr, maxNum = 4) {
+        arr = arr || []
+        $(id).val(arr)
+        if(arr.length === 0) {
+            $(id).reload();
+            return
+        }
+        var childrens = $(id).parent().find('.fs-dropdown .fs-options').children()
+        var domText = ''
+        var num = 0
+        childrens.each(function(index, dom) {
+            var value = $(dom).attr('data-value')
+            if (value && arr.includes(value)) {
+                num++
+                $(dom).addClass('selected')
+                domText += `
+                    <div class="fs-label-item">
+                        <div class="fs-label-text">${$(dom).find('.fs-option-label').text()}</div>
+                        <div class="close-icon" onclick="handleYSelectCloseLabel(this,'${value}')"></div>
+                    </div>
+                `
+            } else {
+                $(dom).removeClass('selected')
+            }
+        })
+        if (domText || num > maxNum) {
+            $(id).parent().find('.fs-label-wrap .fs-label').html(num > maxNum ? `已选中${num}项` : domText)
+        }
+    }
+
+    /**
+     * 获取多选下拉框的选中的label值
+     * @param {*} id 下拉框 Dom ID
+     * @param {*} joinStr label组合分隔符，传false则返回label数组
+     * @returns string
+     */
+    getSelectedLabels(id, joinStr = ',') {
+        var labels = []
+        $(id).parent().find('.fs-dropdown .fs-options .fs-option.selected').each(function (i, el) {
+            let labelVal = $(el).find('.fs-option-label').text()
+            if(labelVal === '请选择') return
+            labels.push(labelVal)
+        })
+        return (typeof joinStr === 'boolean' && !joinStr) ? labels : labels.join(joinStr)
+    }
+
+    showTips({text, ms, top, left}) {
+        if ($("#custom_tip").length) {
+            $("#custom_tip").remove()
+            clearTimeout(this.renderTipTimer)
+        }
+        $(document.body).append(
+            `<div
+                id="custom_tip"
+                style="
+                    position: fixed;
+                    top: ${top};
+                    z-index: 999;
+                "
+            >
+                <div
+                    style="
+                        position: absolute;
+                        background: #181E33CC;
+                        color: #ffffff;
+                        border-radius: 4px;
+                        width: max-content;
+                    "
+                    id="tipDomId"
+                >
+                    <div style="
+                        padding: 10px 12px 10px 12px;
+                        max-width: 500px;
+                    ">${text}</div>
+                    <div 
+                        style="
+                            position: relative;
+                            left: 50%;
+                            bottom: -15px;
+                            width: 0;
+                            height: 0;
+                            border-top: 7px solid #181E33CC;
+                            border-bottom: 8px solid transparent;
+                            border-left: 8px solid transparent;
+                            border-right: 8px solid transparent;
+                            border-radius: 3px;
+                        "
+                    ></div>
+                </div>
+        </div>`)
+        $("#custom_tip").css({
+            left: left - ($("#tipDomId").width() / 2) + 'px'
+        })
+        this.renderTipTimer = setTimeout(() => {
+            $("#custom_tip").remove()
+        }, ms)
+    }
+    /**
+     * 获取暂存报表数据reqparamkey
+     * @param needSaveData 需要保存的数据 {key : value}
+     */
+    getSavedReportParmaDataKey(needSaveData) {
+        let reqparamkey = ''
+        $.ajax({
+            url: $('#adminPath').val() + '/cjgl/report/saveReportParmar',
+            type: 'post',
+            data: JSON.stringify(needSaveData),
+            dataType: 'json',
+            contentType: 'application/json;utf-8',
+            async: false,
+            success: function(res) {
+                if(res.ret == 0) {
+                    reqparamkey = res.data
+                } else {
+                    console.error(res.msg); // for debug
+                }
+            }
+        })
+        return reqparamkey
+    }
+    /**
+     * 获取报表url地址，暂存超长字段参数
+     * @param {*} url 接口地址，可拼接好参数
+     * @param {array} tempKeys 需要暂存的字段数组例如 ['key1', 'key2']
+     * @param {*} dbname 数据库名称，需要在上面useNewReportParamUnit参数中配置的单位才走参数暂存
+     * @returns 
+     */
+    getNewReportUrlWithParam(url, tempKeys, dbname) {
+        if(!Array.isArray(tempKeys)) {
+            throw new Error('tempKeys must be array')
+        }
+
+        if(!this.useNewReportParamUnit.includes(dbname)) {
+            console.log("该单位%s未添加新参数", dbname)
+            return url
+        }
+
+        let cleanUrl = url.split('?')[0]
+
+        let query = new URLSearchParams(url.split('?')[1])
+
+        let tempObj = tempKeys.reduce((obj, key) => {
+            obj[key] = query.get(key)
+            query.delete(key)
+            return obj
+        }, {})
+
+        let dataKey = this.getSavedReportParmaDataKey(tempObj)
+        query.set('reqparamkey', dataKey)
+
+        let newUrl = cleanUrl + '?' + query.toString()
+
+        return newUrl
+    }
+    /**
+     * 跳转报表打印
+     * @param url 接口地址
+     * @param saveData 需要暂存的数据
+     * @param notOpen 是否直接新窗口打开链接，默认新窗口打开
+     * @returns 
+     */
+    toReportPageFn(url, saveData, notOpen){
+        let dataKey = this.getSavedReportParmaDataKey(saveData)
+        if(url.indexOf('?') > -1) {
+            url += '&reqparamkey='+ dataKey
+        } else {
+            url += '?reqparamkey='+ dataKey
+        }
+        if(notOpen) {
+            return url    
+        } else {
+            window.open(url)
+        }
+    }
+    /**
+     * 
+     * @param {function} printDone 弹窗关闭后回调 
+     * @param {selectList} SelectList 选中的id 
+     * @param {string} reportUrl 报表打印url 
+     * @param {string} width 弹窗宽度 默认70%
+     * @param {string} height 弹窗高度 默认80% 
+     * @param {string} title 弹窗名 默认打印报表页面
+     * @param {object} params 打印接口携带参数，如果给了该参数，url上不可自己再拼接参数
+     * @param {string} name 报表打印出名称
+     */
+    reportPrint({
+        printDone = function() {},
+        selectList = [],
+        reportUrl = '',
+        width = '70%',
+        height = '80%',
+        title = '打印报表页面',
+        params = {},
+        name = ''
+    }) {
+        let paramsStr = ''
+        if (Object.keys(params).length > 0) {
+            for (let key in params) {
+                if (!this.isEmpty(params[key]) && !(params[key].indexOf('||') > -1)) {
+                    paramsStr+=`&${key}=${params[key]}`
+                }
+            }
+            paramsStr = paramsStr.substring(1, paramsStr.length)
+        }
+        top.layer.open({
+            type: 2,
+            area: [width, height],
+            title,
+            maxmin: true, //开启最大化最小化按钮
+            content: paramsStr ? reportUrl + '?' + paramsStr : reportUrl,
+            success: function (layero, index) {
+                var iframeWin = layero.find('iframe')[0];
+                iframeWin.contentWindow.setIds(selectList.join(","), name);
+            },
+            btn: ['关闭'],
+            cancel: function (index) {
+                top.layer.close(index);
+            },
+            end: function () {
+                printDone()
+            }
+        });
+    }
+    /**
+     * DES 对称加密 使用时需引入src\main\webapp\WEB-INF\static\common\js\crypto-js.min.js
+     * @param {string} message des加密字符串
+     * @param {string} key 加密标识
+     * @returns string
+     */
+    simpleEncrypt (message, key = 'JWEDUKEY') {
+        if (CryptoJS) {
+            const keyHex = CryptoJS.enc.Utf8.parse(key);
+            const encrypted = CryptoJS.DES.encrypt(message, keyHex, {
+                mode: CryptoJS.mode.ECB,
+                padding: CryptoJS.pad.Pkcs7
+            });
+            return encrypted.toString();
+        }
+        return ''
+    }
+}

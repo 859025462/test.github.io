@@ -1,0 +1,291 @@
+
+<!-- saved from url=(0059)https://jlau.jw.chaoxing.com/admin/system/showHomeView/kjrk -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script src="./jquery.min.js.下载"></script>
+    <script src="./jquery-ui.min.js.下载"></script>
+    <link rel="stylesheet" href="./jquery-ui.min.css">
+    <script src="./curdtools_jqgrid.js.下载"></script>
+    <script src="./contabs.js.下载"></script>
+                 <link rel="shortcut icon" href="https://jlau.jw.chaoxing.com/static/common/favicon.ico?_t=1720087656764">
+<link href="./bootstrap.min.css" rel="stylesheet">
+<link href="./font-awesome.min.css" rel="stylesheet">
+<link href="./animate.css" rel="stylesheet">
+
+    <title>个人信息模块</title>
+    <style>
+        html{
+            overflow: hidden;
+        }
+        body{
+            margin: 0;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        .mainContainer{
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        .topTitle{
+            width: 100%;
+            height: 18%;
+        }
+        .entrance{
+            width:100%;
+            height: 100%;
+        }
+        .navBar{
+            width: 90%;
+            height: 100%;
+            margin: 0 auto;
+            /*border-bottom: 1px solid #E8E8E8;*/
+        }
+        .titleContainer {
+            float:left;
+            display: inline-block;
+            width: 50%;
+            height: 100%;
+        }
+        .linkMore{
+            float:right;
+            display: inline-block;
+            width: 20%;
+            height: 100%;
+        }
+        .entranceTitle{
+            position: relative;
+            top: 12px;
+            color: #5483CD;
+            font-weight: bold;
+            font-size: 15px;
+
+        }
+        .iconLink{
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            position: relative;
+            top: 3px;
+            margin-right: 10px;
+            background: url("/static/img/Entrance.svg") no-repeat;
+        }
+        /*.linkBtn{*/
+        /*margin-top: 20px;*/
+        /*margin-left: 50px;*/
+        /*display: block;*/
+        /*color: #9B9B9B;*/
+        /*font-size: 12px;*/
+        /*text-decoration: none;*/
+        /*}*/
+        /*.linkBtn:hover{*/
+        /*color:#B1D3F3;*/
+        /*}*/
+        .addBlock{
+            margin: 0 auto;
+            width: 90%;
+            height: 100%;
+        }
+        /*.addContainer{*/
+        /*width: 80%;*/
+        /*height: 20%;*/
+        /*margin: 0 auto;*/
+        /*}*/
+        .entranceBar{
+            display: inline-block;
+            width: auto ;
+            margin: 10px 0 0 10px;
+        }
+        .entranceBar:hover{
+            cursor: pointer;
+        }
+        .entranceBar>a{
+            text-decoration: none;
+            border: 1px solid #ECECEC;
+            border-radius: 4px;
+            width: 100%;
+            height: 32px;
+            line-height: 32px;
+            display: block;
+            font-size: 12px;
+            padding: 0 20px;
+            color: #666;
+        }
+        .entranceBar>a:hover{
+            color:#2AA0F5;
+            border: 1px solid #2AA0F5;
+        }
+        .addEntranceBtn{
+            float: right;
+            width: 25px;
+            height: 25px;
+            border: none;
+            padding: 0;
+            border-radius: 30px;
+            margin: 15px 0 0 50px;
+            background: url("/static/sys/addGray.png?_t=1720087656764") center no-repeat;
+        }
+        .addEntranceBtn:hover{
+            cursor: pointer;
+            background: url("/static/sys/addBlue.png?_t=1720087656764") center no-repeat;
+        }
+        .addEntranceBtn:focus{
+            outline: 0;
+        }
+        .barImg{
+            display: none;
+            position: relative;
+            width: 20px;
+            height: 20px;
+            top: 5px;
+            left: -5px;
+            background: url("/static/img/addTitle.svg")no-repeat;
+        }
+        .entranceBar>a:hover .barImg,.barImg:hover{
+            background: url("/static/img/hoverChoose.svg")no-repeat;
+        }
+        .barContainer{
+            width: 100%;
+            height: 100%;
+            padding-top: 40px;
+        }
+        .entranceBar>a.deleteBtn{
+            width: 14px;
+            height: 14px;
+            border: none;
+            padding: 0;
+            float: right;
+            position: relative;
+            top: -4px;
+            left: 4px;
+        }
+        .entranceBar>a.deleteBtn:hover{
+            width: 15px;
+            height: 15px;
+        }
+        .entranceBar>a.deleteBtn img{
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+        .addMore1{
+            width: 16px;
+            height: 16px;
+            display: inline-block;
+            float: right;
+            margin-top: 20px;
+            margin-right: -45px;
+        }
+    </style>
+</head>
+<body>
+<div class="mainContainer">
+    <div class="entrance">
+        <div class="addBlock">
+            <button id="addEntranceBtn" title="添加" class="addEntranceBtn" onclick="openDialogReloadParent(&#39;快捷入口设置&#39;, &#39;/admin/system/showHomeView/addkjrk&#39;, &#39;&#39;)"></button>
+            <a class="addMore1" title="排序" href="javascript:void(0);" onclick="openDialogReloadParent1(&#39;快捷入口排序(拖动排序)&#39;, &#39;/admin/system/showHomeView/kjrkpx&#39;, &#39;&#39;)"><img src="./up02.png" alt=""></a>
+            <div class="barContainer">
+                
+                    <div class="entranceBar">
+                        <a class="deleteBtn" href="https://jlau.jw.chaoxing.com/admin/system/showHomeView/kjrk#" onclick="deleteFast(&#39;c131417863ce48d9b829773fac93e7a2&#39;)">
+                            <img src="./delete.png" alt="">
+                        </a>
+                        <a class="enteranceA" onclick="openTabForMain(&#39;/admin//xsd/xsdzgcjcx/zgcjcx&#39;,&#39;最高成绩查询&#39;, false)">
+                            
+                            
+                                <i class="barImg"></i>
+                            
+                                最高成绩查询</a>
+                    </div>
+                
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $(".entranceBar").each(function(){
+
+        var img = $(this).find('img');
+
+        $(this).hover(function() {
+            $(img).css('display', 'block');
+        }, function() {
+            $(img).css('display', 'none');
+        });
+
+        $(img).hover(function() {
+            $(this).css('display', 'block');
+        })
+    });
+
+    function deleteFast(menuId){
+        $.ajax({
+            type : "post",
+            url : "/admin/system/showHomeView/deletekjrk",
+            data : {menuId: menuId},
+            async : false,
+            success : function(data) {
+                top.window.location.reload();
+            },
+            error : function(XMLHttpRequest, textStatus, errorThrown) {
+                top.layer.alert('删除快捷入口失败', {icon: 0, title:'警告'});
+            }
+        });
+
+    }
+
+
+
+    //打开对话框(添加修改)
+    function openDialogReloadParent1(title, url, gridId, width, height) {
+        width = width ? width : '800px';
+        height = height ? height : '500px';
+        if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {//如果是移动端，就使用自适应大小弹窗
+            width = 'auto';
+            height = 'auto';
+        } else {//如果是PC端，根据用户设置的width和height显示。
+
+        }
+        top.layer.open({
+            type: 2,
+            area: [width, height],
+            title: title,
+            maxmin: true, //开启最大化最小化按钮
+            content: url,
+            success: function (layero, index) {
+                //遍历父页面的button,使其失去焦点，再按enter键就不会弹框了
+                $(":button").each(function () {
+                    $(this).blur();
+                });
+            },
+            btn: ['确定', '关闭'],
+            yes: function (index, layero) {
+                var body = top.layer.getChildFrame('body', index);
+                var iframeWin = layero.find('iframe')[0]; //得到iframe页的窗口对象，执行iframe页的方法：iframeWin.method();
+                //文档地址
+                //http://www.layui.com/doc/modules/layer.html#use
+                iframeWin.contentWindow.doSubmit1(function () {
+                    setTimeout(function () {
+                        top.layer.close(index);
+                        window.location.reload();
+                    }, 100);//延时0.1秒，对应360 7.1版本bug
+                });
+
+            },
+            cancel: function (index) {
+
+            }
+        });
+
+    }
+</script>
+<input type="hidden" id="adminPath" value="/admin">
+<!-- jqGrid curdtools-->
+		<script src="./curdtools_jqgrid.js.下载"></script>
+
+
+
+<div id="phraseJoinewrskdfdswerhnyikyofd" data-v-app=""><!----><!----><!----></div></body></html>

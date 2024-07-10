@@ -1,0 +1,635 @@
+
+<!-- saved from url=(0062)https://jlau.jw.chaoxing.com/admin/system/showHomeView/xsdtzgg -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="./bootstrap-slider.min.css">
+    <link rel="stylesheet" href="./bootstrap-theme.min.css">
+    <link rel="stylesheet" href="./font-awesome.css">
+    <script src="./jquery.min.js.下载"></script>
+    <script src="./bootstrap.min(1).js.下载"></script>
+    <script src="./jquery.bootstrap.newsbox.js.下载"></script>
+    <title>通知公告</title>
+    <style>
+        ::-webkit-scrollbar
+        {
+            width: 8px;
+            height: 8px;
+            background-color: #F5F5F5;
+        }
+
+        /*定义滚动条轨道 内阴影+圆角*/
+        ::-webkit-scrollbar-track
+        {
+            -webkit-box-shadow: inset 0 0 6px #ccc;
+            border-radius: 10px;
+            background-color: #F5F5F5;
+        }
+
+        /*定义滑块 内阴影+圆角*/
+        ::-webkit-scrollbar-thumb
+        {
+            border-radius: 10px;
+            -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+            background-color: #7E7E7E;
+        }
+        html{
+            overflow: hidden;
+        }
+        body{
+            margin: 0;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        .tabContainer{
+            width: 100%;
+            height: 100%;
+        }
+        .title{
+            display: inline-block;
+            width: 17%;
+            height: 50px;
+            position: relative;
+            left: 26px;
+            color: #5483CD;
+            font-weight: bold;
+            font-size: 15px;
+            border-bottom: 1px solid #d8d8d8;
+        }
+        #myTab{
+            display: inline-block;
+            width: 80%;
+            height: 50px;
+            float: right;
+            position: relative;
+            left: -30px;
+            border-bottom: 1px solid #d8d8d8;
+        }
+        .nav-tabs>li>a{
+            border:none;
+            padding: 5px;
+            color:#666;
+            margin: 0;
+            height: 50px;
+            width: 50%;
+            line-height: 50px;
+        }
+        #time{
+      
+        }
+        .tab-content{
+            width: 88.5%;
+            height: 80%;
+            margin: 0 0 0 27px;
+            position: relative;
+            top: 2px;
+        }
+        .nav-tabs>li {
+            float: left;
+            width: 30%;
+            text-align: center;
+            height: 100%;
+        }
+        .titleImg{
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            position: relative;
+            top: 5px;
+        }
+        .titleName{
+            position: relative;
+            top: 6px;
+            left:2px;
+        }
+        /*#myTab>li.firstTab{*/
+            /*margin-left: 50px;*/
+        /*}*/
+        .nav-tabs>li>a:hover {
+            background-color: transparent;
+            height: 100%;
+            color: #2AA0F5;
+            border: 0;
+        }
+        .nav-tabs>li.active>a, .nav-tabs>li.active>a:focus, .nav-tabs>li.active>a:hover{
+            border:0;
+            border-bottom: 2px solid #2AA0F5;
+        }
+        .nav-tabs>li.active>a:hover{
+            background-color: transparent;
+            border-top: 0;
+            border-left: 0;
+            border-right: 0;
+            border-bottom: 2px solid #2AA0F5;
+            cursor: pointer;
+        }
+        .checkMore{
+            float: right;
+            font-size: 12px;
+            position: absolute;
+            right: 35px;
+            top: 23px;
+        }
+        .tab-content>.tab-pane{
+            height: 100%;
+        }
+        .classTable td{
+            width: 25%;
+        }
+        .nav-tabs>li.active>a{
+            color: #2AA0F5 !important;
+            font-size: 14px;
+            border-bottom: 2px solid #2AA0F5;
+            border-left: 0;
+            border-top: 0;
+            border-right: 0;
+        }
+        .carousel-indicators{
+            bottom: -5px;
+        }
+        .carousel-control{
+            opacity: 1;
+        }
+        .messageUl {
+            margin-top: 5px;
+            margin-bottom: 0;
+            width: 100%;
+            height: 100%;
+            list-style: none;
+            padding: 10px;
+        }
+        .messageLi{
+            width: 50%;
+            height: 23px;
+            font-size: 13px;
+            overflow:hidden;
+            margin: 7px 0 0 0;
+            text-overflow:ellipsis;
+            white-space:nowrap
+        }
+        .messageLi a{
+            color:#67686A;
+        }
+        .messageLi a:hover{
+            color: #4B86E9;
+        }
+        .carousel-control{
+            width: 20px;
+            height: 20px;
+            color: #4B86E9;
+            position: absolute;
+            top: 40%;
+            left: -15px;
+        }
+        .rightControl{
+            right: -17px !important;
+        }
+        .carousel-control.left,.carousel-control.right{
+            background-image: none;
+        }
+        .carousel-control .glyphicon-chevron-left,.carousel-control.right .glyphicon-chevron-right{
+            color:#4B86E9;
+        }
+        .carousel-indicators li {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            margin: 1px;
+            text-indent: -999px;
+            cursor: pointer;
+            background-color: #B1D3F3;
+            border: 1px solid #fff;
+            border-radius: 10px;
+        }
+        .carousel-indicators .active {
+            width: 13px;
+            height: 13px;
+            margin: 0;
+            background-color: #4B86E9;
+        }
+        .carousel-inner {
+            position: relative;
+            width: 94%;
+            overflow: hidden;
+            margin: auto;
+        }
+        .publishTime{
+            display: inline-block;
+            float: right;
+            position: relative;
+            right: 2px;
+            font-style: normal;
+            color: #67686A;
+        }
+        .messageLi a{
+            display: inline-block;
+            width: 312px;
+            overflow: hidden;
+            text-overflow:ellipsis;
+            white-space: nowrap;
+        }
+        .glyphicon{margin-right:4px !important;/*override*/}
+        .panel ul{padding:0;margin:0;list-style:none;}
+
+        .news-item a{
+            width: 100%;
+            color: #666;
+            display: inline-block;
+            word-break: keep-all;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-left: 5px;
+        }
+        .news-item a:hover,.news-item a:hover .titleNum,.news-item a:hover .pulishTime{
+            color: #2AA0F5;
+            text-decoration: none;
+  		}
+       
+        .container,.row,.col-md-4,.panel{
+            width: 100%;
+            height: 100%;
+            border: 0;
+            padding: 0;
+        }
+        .col-xs-12{
+            padding: 0;
+            height: 100%;
+        }
+        .demo{
+            overflow-y: auto;
+            overflow-x: hidden;
+            height: 86% !important;
+        }
+        .row,.panel{
+            margin: 0;
+        }
+        .col-md-4{
+            padding: 0;
+        }
+        .panel-body {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            position: relative;
+        }
+        /*.panel-footer {*/
+            /*padding:0 ;*/
+            /*background-color: #fff;*/
+            /*border:0;*/
+        /*}*/
+        .news-item{
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+            height: 30px;
+            line-height: 30px;
+            margin:0;
+            border-bottom:1px dotted #ddd;
+        }
+
+        /*.panel-footer{*/
+            /*position: relative;*/
+            /*top: 20px;*/
+            /*width: 22%;*/
+            /*height: 22px;*/
+            /*margin: 0 auto;*/
+        /*}*/
+        /*.next{*/
+            /*position: relative;*/
+            /*top: -217px;*/
+            /*left: 173px;*/
+            /*border: 0;*/
+            /*width: 443px;*/
+            /*height: 22px;*/
+            /*text-align: center;*/
+            /*border: 0 !important;*/
+        /*}*/
+        /*.prev{*/
+            /*position: relative;*/
+            /*left: 173px;*/
+            /*border: 0;*/
+            /*width: 443px;*/
+            /*height: 22px;*/
+            /*text-align: center;*/
+            /*border: 0 !important;*/
+        /*}*/
+        .pagination > li > a:focus, .pagination > li > span:focus, .pagination > li > span:hover {
+            z-index: 2;
+            color: rgb(35, 82, 124);
+            background-color: #fff;
+            border-color: #fff;
+        }
+        .pagination > li > a:hover{
+            background-color: #EDEDED;
+        }
+        .label-warning,.label-success{
+            position: relative;
+            padding: 2px;
+            margin-left: 5px;
+            font-weight: normal;
+            top: 10px;
+        }
+        .pulishTime{
+            float: right;
+        }
+        .demoNum,.demoTitle,.demoTime{
+            font-size: 12px;
+            color: #333;
+        }
+        .demoTitle{
+            display: inline-block;
+            width: 340px;
+            text-align: center;
+            padding-right: 100px;
+        }
+        .demoNum{
+            display: inline-block;
+            width: 50px;
+            text-align: center;
+        }
+        .titleNum{
+            width: 40px;
+            height: 100%;
+            float: left;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            margin-right: 15px;
+        }
+        .label-success{
+            background: #2AA0F5;
+            border-radius: 2px;
+            font-size: 10px;
+            margin-right: 5px;
+            height: 12px;
+        }
+        .label-warning{
+            background: #FF4F65;
+            border-radius: 2px;
+            font-size: 10px;
+            margin-right: 5px;
+            height: 12px;
+        }
+        .nav-tabs>li.active>a, .nav-tabs>li>a,.news-item a {
+            font-size: 14px;
+        }
+        @media (max-width:1440px){
+            .nav-tabs>li>a,.nav-tabs>li.active>a,.news-item a,.label-warning, .label-success{
+                font-size: 12px;
+            }
+        }
+        .labelDiv{
+            float: left;
+            height: 100%;
+            width: 60px;
+            position: relative;
+        }
+        .messageTitle{
+            display: inline-block;
+            width: 50%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            -o-text-overflow: ellipsis;
+            white-space:nowrap;
+        }
+        .news-item a{
+            display: block;
+            height: 100%;
+        }
+    </style>
+
+    <!--[if IE]>
+    <script src="http://libs.useso.com/js/html5shiv/3.7/html5shiv.min.js?_t=1720087656764"></script>
+    <![endif]-->
+    
+     <script type="text/javascript">
+     $(document).ready(function(){   	 
+    	 $("#demo").empty();
+    	 $("#demo1").empty();
+    	 $("#demo2").empty();    	
+    	 $.ajax({
+ 			type : "get",
+ 			url : "/admin/system/showHomeView/getxsdtzlist",			
+ 			dataType : "json",
+ 			async:false,
+ 			success : function(data) { 				
+	 		    $("#wdts").text("("+data.wdts+")");
+				var list=data.list;
+				if(list!=undefined&&list.length>0){
+					var wds=1;
+					var yds=1;
+	 				for (var i = 0; i < list.length; i++) {
+	 					var sfyd = list[i].sfyd;
+	 					var sfzd = list[i].sfzd;
+	 					var K = list[i].title;
+	 					var T = list[i].releasedate;
+	 					var I = list[i].id;
+	 					var num = i+1;
+	 					if(sfyd=="0"){
+	 						if(sfzd=="1"){
+	 		 	 				$("#demo").append("<li class=\"news-item\"><a href=\"javascript:void(0)\" onclick=\"a('"+I+"')\"><span class='titleNum'>"+num+"</span><div class='labelDiv'><span class ='label label-warning'>新</span><span class ='label label-success'>置顶</span></div><span class='messageTitle'>"+K+"</span><span class='pulishTime'>"+T+"</span></a></li>");
+	 						}else{
+	 		 					$("#demo").append("<li class=\"news-item\"><a href=\"javascript:void(0)\" onclick=\"a('"+I+"')\"><span class='titleNum'>"+num+"</span><div class='labelDiv'><span class ='label label-warning'>新</span></div><span class='messageTitle'>"+K+"</span><span class='pulishTime'>"+T+"</span></a></li>");
+	 						}
+			 			$("#demo1").append("<li class=\"news-item\"><a href=\"javascript:void(0)\" onclick=\"a('"+I+"')\"><span class='titleNum'>"+wds+"</span><div class='labelDiv'></div>"+K+"<span class='pulishTime'>"+T+"</span></a></li>");
+	                    wds=wds+1;
+	 					}else {
+	 						if(sfzd=="1"){
+	 		 	 				$("#demo").append("<li class=\"news-item\"><a href=\"javascript:void(0)\" onclick=\"a('"+I+"')\"><span class='titleNum'>"+num+"</span><div class='labelDiv'><span class ='label label-success'>置顶</span></div><span class='messageTitle'>"+K+"</span><span class='pulishTime'>"+T+"</span></a></li>");
+	 						}else{
+	 		 	 				$("#demo").append("<li class=\"news-item\"><a href=\"javascript:void(0)\" onclick=\"a('"+I+"')\"><span class='titleNum'>"+num+"</span><div class='labelDiv'></div><span class='messageTitle'>"+K+"</span><span class='pulishTime'>"+T+"</span></a></li>");
+	 						}
+			 			$("#demo2").append("<li class=\"news-item\"><a href=\"javascript:void(0)\" onclick=\"a('"+I+"')\"><span class='titleNum'>"+yds+"</span><div class='labelDiv'></div>"+K+"<span class='pulishTime'>"+T+"</span></a></li>");
+	                    yds=yds+1;
+	 					}
+	 				}  
+				}
+ 			}
+ 		});   
+     });
+     
+     
+     function a(id){    	 
+	        width = '50%';
+	        height = '80%';
+	        var url="/admin/system/tzsjx/showdetail?id="+id;
+	        if(navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){//如果是移动端，就使用自适应大小弹窗
+	            width='auto';
+	            height='auto';
+	        }else{//如果是PC端，根据用户设置的width和height显示。
+	            /* 	width='100%';
+	                height='100%'; */
+	        }
+	        top.layer.open({
+	            type: 2,
+	            area: [width, height],
+	            title: "详情",
+	            maxmin: true, //开启最大化最小化按钮
+	            content: url,
+	            btn: ['关闭'],
+	            
+	            end: function(){
+	           
+		               window.location.href="/admin/system/showHomeView/xsdtzgg";
+	              	
+	            }
+	        });
+	    }
+     
+     function more(width,height){
+
+         if(navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){//如果是移动端，就使用自适应大小弹窗
+             width='auto';
+             height='auto';
+         }else{//如果是PC端，根据用户设置的width和height显示。
+             width='100%';
+             height='100%';
+         }
+         top.layer.open({
+             type: 2,
+             area: [width, height],
+             title: "我的课程表",
+             content: '/admin/system/tzsjx' ,
+             maxmin: true, //开启最大化最小化按钮
+             btn: ['关闭'],
+             cancel: function(index){
+
+             }
+         });
+     }
+      </script>
+
+</head>
+<body>
+<div class="tabContainer">
+    <div class="title">
+        
+        
+    </div>
+    <ul id="myTab" class="nav nav-tabs">
+        <li class="active firstTab"><a href="https://jlau.jw.chaoxing.com/admin/system/showHomeView/xsdtzgg#All" data-toggle="tab">全部</a></li>
+        <li><a href="https://jlau.jw.chaoxing.com/admin/system/showHomeView/xsdtzgg#Unread" data-toggle="tab"><span>未读</span><span id="wdts">(28)</span></a></li>
+        <li><a href="https://jlau.jw.chaoxing.com/admin/system/showHomeView/xsdtzgg#Read" data-toggle="tab">已读</a></li>
+    </ul>
+    <div class="checkMore">
+        <a href="https://jlau.jw.chaoxing.com/admin/system/showHomeView/xsdtzgg#" onclick="more()">
+            <img src="./checkMore.png" alt="">
+        </a>
+    </div>
+    <div id="myTabContent" class="tab-content">
+        <div class="tab-pane fade in active" id="All">
+            <div class="container mp30">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="panel panel-default">
+                            
+                            
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div style="border-bottom: 1px dotted #ddd;height: 30px;line-height: 30px;">
+                                            <span class="demoNum">序号</span>
+                                            <span class="demoTitle">标题</span>
+                                            <span class="demoTime">日期</span>
+                                        </div>
+                                        <ul class="demo" id="demo"><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;349f001dac5044ba9a23be1fb736740d&#39;)"><span class="titleNum">1</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">7月3日期末考试情况通报</span><span class="pulishTime">2024-07-03 19:47:32</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;5d03dc74184a453595500916b04f5e20&#39;)"><span class="titleNum">2</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">7月1日、2日期末考试情况通报</span><span class="pulishTime">2024-07-02 20:28:33</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;69676786a89a4fb39654599a23d5415a&#39;)"><span class="titleNum">3</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">2023-2024-2期末考试排考通知</span><span class="pulishTime">2024-06-13 18:47:48</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;04fe3dd631c14a0d84cfb6f9dd459a4e&#39;)"><span class="titleNum">4</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">2023-2024-2期末考试排考通知</span><span class="pulishTime">2024-06-13 18:47:45</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;a96d7eff925f4193919ab91dcba8b273&#39;)"><span class="titleNum">5</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">5月22日考情通报</span><span class="pulishTime">2024-05-28 15:22:55</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;3c3a8d48f2d54a2f86d27c863cbfa77f&#39;)"><span class="titleNum">6</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">5月15日考情通报</span><span class="pulishTime">2024-05-20 17:03:08</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;372c3a8ed4bf4cb48d4847da37f72332&#39;)"><span class="titleNum">7</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">5月9日考情通报</span><span class="pulishTime">2024-05-13 08:51:05</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;75d6e5509fff4a5b9f3b1116cf487c37&#39;)"><span class="titleNum">8</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">2023-2024-2期末考试排考通知</span><span class="pulishTime">2024-05-12 12:36:58</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;704848ac67a744b68177ced3dc2aa32a&#39;)"><span class="titleNum">9</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">2023-2024-2期末考试排考通知</span><span class="pulishTime">2024-05-12 12:36:54</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;a62dad50c66a42d1952437fe94ff362c&#39;)"><span class="titleNum">10</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">2023-2024-2期末考试排考通知</span><span class="pulishTime">2024-05-12 12:36:54</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;5bbb2910ef8b44d68da2ddc4092e933b&#39;)"><span class="titleNum">11</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">2023-2024-2期末考试排考通知</span><span class="pulishTime">2024-05-12 12:36:44</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;a180c8730cc24d188a1d7aef618e5c9e&#39;)"><span class="titleNum">12</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">2023-2024-2期末考试排考通知</span><span class="pulishTime">2024-05-12 12:36:40</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;68acd5654d9b4767bae8ae8edae02c11&#39;)"><span class="titleNum">13</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">2023-2024-2期末考试排考通知</span><span class="pulishTime">2024-05-12 12:36:40</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;e4baa36ed4164938b64fa491c329100f&#39;)"><span class="titleNum">14</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">关于考试要求的温馨提示</span><span class="pulishTime">2024-05-06 10:27:54</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;e5e13f7793f14c9da46054b874ed279f&#39;)"><span class="titleNum">15</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">关于2024年6月大学外语等级考试报名的通知</span><span class="pulishTime">2024-03-14 14:20:04</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;97213433e50446b7b7680e854dec5cc4&#39;)"><span class="titleNum">16</span><div class="labelDiv"></div><span class="messageTitle">关于2023-2024学年第二学期通识选修课选课的通知</span><span class="pulishTime">2024-03-01 16:23:33</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;b9e3c4c013a546e1af3f067c3d1a8521&#39;)"><span class="titleNum">17</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">2月27日补考考试情况通报</span><span class="pulishTime">2024-02-27 17:11:57</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;2712a205664b458c9002818a749d28d0&#39;)"><span class="titleNum">18</span><div class="labelDiv"></div><span class="messageTitle">1月8日期末考试情况通报</span><span class="pulishTime">2024-01-08 17:01:06</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;a463bfc778c546f880473ed0f166e138&#39;)"><span class="titleNum">19</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">1月5日期末考试情况通报</span><span class="pulishTime">2024-01-08 08:17:12</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;fc161c405aa643fcad22666eec25d1a6&#39;)"><span class="titleNum">20</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">测试1</span><span class="pulishTime">2024-01-05 15:36:30</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;4ec45223081f48ef9b68db65e83e9f6a&#39;)"><span class="titleNum">21</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">1月4日期末考试情况通报</span><span class="pulishTime">2024-01-05 14:33:14</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;d376de34ca1449d69927422ac728616f&#39;)"><span class="titleNum">22</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">英语考试班长无需报送“考试评价”数据</span><span class="pulishTime">2024-01-03 16:40:51</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;9a83a7961b964521a15ecb933e20bbb0&#39;)"><span class="titleNum">23</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">2023-2024-1期末考试排考通知</span><span class="pulishTime">2023-12-15 10:51:42</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;01188d5200af47d9b57dc5cb37010f36&#39;)"><span class="titleNum">24</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">2023-2024-1期末考试排考通知</span><span class="pulishTime">2023-12-15 10:51:31</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;21c63f7cea4b4e4bb75d7fac6e2fe93f&#39;)"><span class="titleNum">25</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">2023-2024-1期末考试排考通知</span><span class="pulishTime">2023-12-15 10:51:28</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;07fa3c5b52da4231be8e0765ddad4be2&#39;)"><span class="titleNum">26</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">2023-2024-1期末考试排考通知</span><span class="pulishTime">2023-12-15 10:51:25</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;1655cc34e981404d830bdd7f7fffcb30&#39;)"><span class="titleNum">27</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">2023-2024-1期末考试排考通知</span><span class="pulishTime">2023-12-15 10:51:11</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;63088fd130ce41dfbb77b06d5480000a&#39;)"><span class="titleNum">28</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">2023-2024-1期末考试排考通知</span><span class="pulishTime">2023-12-15 10:51:07</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;300034a75b5a4dbebb58d6bd971ff4c9&#39;)"><span class="titleNum">29</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">2023年12月大学外语四、六级考试考场分布</span><span class="pulishTime">2023-12-14 11:24:34</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;109bffcae77740cba185c54beba18b20&#39;)"><span class="titleNum">30</span><div class="labelDiv"></div><span class="messageTitle">2023年12月大学外语四、六级考试考生考前须知</span><span class="pulishTime">2023-12-14 11:10:07</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;1d3d9485ea514b1eac200962632e1d7c&#39;)"><span class="titleNum">31</span><div class="labelDiv"><span class="label label-warning">新</span></div><span class="messageTitle">2023年12月大学外语四、六级考试考生考前须知</span><span class="pulishTime">2023-12-13 15:54:11</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;dbfdfa8e4546482caef3979e15290dd5&#39;)"><span class="titleNum">32</span><div class="labelDiv"></div><span class="messageTitle">2023-2024-1期末考试排考通知</span><span class="pulishTime">2023-11-19 11:31:31</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;877e11aac4c648809ff726a08473ea95&#39;)"><span class="titleNum">33</span><div class="labelDiv"></div><span class="messageTitle">2023-2024-1期末考试排考通知</span><span class="pulishTime">2023-11-13 09:28:58</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;7847d00702c9450a8a1ec1935d2bcb7e&#39;)"><span class="titleNum">34</span><div class="labelDiv"></div><span class="messageTitle">教师调换通知</span><span class="pulishTime">2023-09-26 09:32:55</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;d377009e539a46e59b5a5699cf15bcbc&#39;)"><span class="titleNum">35</span><div class="labelDiv"></div><span class="messageTitle">2022-2023-2期末考试排考通知</span><span class="pulishTime">2023-06-26 12:33:50</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;d2c31822b0bb48d1a9e85fec0d775432&#39;)"><span class="titleNum">36</span><div class="labelDiv"></div><span class="messageTitle">2022-2023-2期末考试排考通知</span><span class="pulishTime">2023-06-26 12:33:30</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;d9a94d4c1d7849cf91c7ba71f0b28e42&#39;)"><span class="titleNum">37</span><div class="labelDiv"></div><span class="messageTitle">2022-2023-2期末考试排考通知</span><span class="pulishTime">2023-06-26 12:32:52</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;0c7bad82445b4e1e8aac17fb0b9e76ca&#39;)"><span class="titleNum">38</span><div class="labelDiv"></div><span class="messageTitle">2022-2023-2期末考试排考通知</span><span class="pulishTime">2023-06-26 12:32:34</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;d276183ac0a14ef78101c331dec51a7b&#39;)"><span class="titleNum">39</span><div class="labelDiv"></div><span class="messageTitle">2022-2023-2期末考试排考通知</span><span class="pulishTime">2023-06-26 12:03:33</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;37dc83caac0d4383b2f95b3645393f75&#39;)"><span class="titleNum">40</span><div class="labelDiv"></div><span class="messageTitle">2022-2023-2期末考试排考通知</span><span class="pulishTime">2023-06-26 12:03:15</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;73e5630df1844cf581881637a79c0244&#39;)"><span class="titleNum">41</span><div class="labelDiv"></div><span class="messageTitle">2022-2023-2期末考试排考通知</span><span class="pulishTime">2023-06-26 12:02:37</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;01441b5d151649c59e2191e1a1ec9aeb&#39;)"><span class="titleNum">42</span><div class="labelDiv"></div><span class="messageTitle">2022-2023-2期末考试排考通知</span><span class="pulishTime">2023-06-26 12:02:18</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;2041207858c143f0a9c4b4d810c87231&#39;)"><span class="titleNum">43</span><div class="labelDiv"></div><span class="messageTitle">2022-2023-2期末考试排考通知</span><span class="pulishTime">2023-06-26 11:59:35</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;736bce684a83400cbf2aac0b65dc70e1&#39;)"><span class="titleNum">44</span><div class="labelDiv"></div><span class="messageTitle">2022-2023-2期末考试排考通知</span><span class="pulishTime">2023-06-26 11:59:15</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;b251409f2b0a4d299ff61f5fda403aaf&#39;)"><span class="titleNum">45</span><div class="labelDiv"></div><span class="messageTitle">2022-2023-2期末考试排考通知</span><span class="pulishTime">2023-06-26 11:58:35</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;a129f50bad0047eba31f60addd7e1e82&#39;)"><span class="titleNum">46</span><div class="labelDiv"></div><span class="messageTitle">2022-2023-2期末考试排考通知</span><span class="pulishTime">2023-06-26 11:58:17</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;aa9147a89b6a4248ac172a5c3f27ad35&#39;)"><span class="titleNum">47</span><div class="labelDiv"></div><span class="messageTitle">2022-2023-2期末考试排考通知</span><span class="pulishTime">2023-06-26 11:04:19</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;cccbfb801ae847f2a725551146d988b1&#39;)"><span class="titleNum">48</span><div class="labelDiv"></div><span class="messageTitle">2022-2023-2期末考试排考通知</span><span class="pulishTime">2023-06-26 11:03:54</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;2263c74cf53a4b1e857ee39a94ccd436&#39;)"><span class="titleNum">49</span><div class="labelDiv"></div><span class="messageTitle">2022-2023-2期末考试排考通知</span><span class="pulishTime">2023-06-26 11:02:59</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;159e4c6a3fb74e568d28a38dd9704cad&#39;)"><span class="titleNum">50</span><div class="labelDiv"></div><span class="messageTitle">2022-2023-2期末考试排考通知</span><span class="pulishTime">2023-06-26 11:02:38</span></a></li></ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="Unread">
+            <div class="container mp30">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="panel panel-default">
+                            
+                            
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div style="border-bottom: 1px dotted #ddd;height: 30px;line-height: 30px;">
+                                            <span class="demoNum">序号</span>
+                                            <span class="demoTitle">标题</span>
+                                            <span class="demoTime">日期</span>
+                                        </div>
+                                        <ul class="demo" id="demo1"><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;349f001dac5044ba9a23be1fb736740d&#39;)"><span class="titleNum">1</span><div class="labelDiv"></div>7月3日期末考试情况通报<span class="pulishTime">2024-07-03 19:47:32</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;5d03dc74184a453595500916b04f5e20&#39;)"><span class="titleNum">2</span><div class="labelDiv"></div>7月1日、2日期末考试情况通报<span class="pulishTime">2024-07-02 20:28:33</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;69676786a89a4fb39654599a23d5415a&#39;)"><span class="titleNum">3</span><div class="labelDiv"></div>2023-2024-2期末考试排考通知<span class="pulishTime">2024-06-13 18:47:48</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;04fe3dd631c14a0d84cfb6f9dd459a4e&#39;)"><span class="titleNum">4</span><div class="labelDiv"></div>2023-2024-2期末考试排考通知<span class="pulishTime">2024-06-13 18:47:45</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;a96d7eff925f4193919ab91dcba8b273&#39;)"><span class="titleNum">5</span><div class="labelDiv"></div>5月22日考情通报<span class="pulishTime">2024-05-28 15:22:55</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;3c3a8d48f2d54a2f86d27c863cbfa77f&#39;)"><span class="titleNum">6</span><div class="labelDiv"></div>5月15日考情通报<span class="pulishTime">2024-05-20 17:03:08</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;372c3a8ed4bf4cb48d4847da37f72332&#39;)"><span class="titleNum">7</span><div class="labelDiv"></div>5月9日考情通报<span class="pulishTime">2024-05-13 08:51:05</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;75d6e5509fff4a5b9f3b1116cf487c37&#39;)"><span class="titleNum">8</span><div class="labelDiv"></div>2023-2024-2期末考试排考通知<span class="pulishTime">2024-05-12 12:36:58</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;704848ac67a744b68177ced3dc2aa32a&#39;)"><span class="titleNum">9</span><div class="labelDiv"></div>2023-2024-2期末考试排考通知<span class="pulishTime">2024-05-12 12:36:54</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;a62dad50c66a42d1952437fe94ff362c&#39;)"><span class="titleNum">10</span><div class="labelDiv"></div>2023-2024-2期末考试排考通知<span class="pulishTime">2024-05-12 12:36:54</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;5bbb2910ef8b44d68da2ddc4092e933b&#39;)"><span class="titleNum">11</span><div class="labelDiv"></div>2023-2024-2期末考试排考通知<span class="pulishTime">2024-05-12 12:36:44</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;a180c8730cc24d188a1d7aef618e5c9e&#39;)"><span class="titleNum">12</span><div class="labelDiv"></div>2023-2024-2期末考试排考通知<span class="pulishTime">2024-05-12 12:36:40</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;68acd5654d9b4767bae8ae8edae02c11&#39;)"><span class="titleNum">13</span><div class="labelDiv"></div>2023-2024-2期末考试排考通知<span class="pulishTime">2024-05-12 12:36:40</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;e4baa36ed4164938b64fa491c329100f&#39;)"><span class="titleNum">14</span><div class="labelDiv"></div>关于考试要求的温馨提示<span class="pulishTime">2024-05-06 10:27:54</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;e5e13f7793f14c9da46054b874ed279f&#39;)"><span class="titleNum">15</span><div class="labelDiv"></div>关于2024年6月大学外语等级考试报名的通知<span class="pulishTime">2024-03-14 14:20:04</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;b9e3c4c013a546e1af3f067c3d1a8521&#39;)"><span class="titleNum">16</span><div class="labelDiv"></div>2月27日补考考试情况通报<span class="pulishTime">2024-02-27 17:11:57</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;a463bfc778c546f880473ed0f166e138&#39;)"><span class="titleNum">17</span><div class="labelDiv"></div>1月5日期末考试情况通报<span class="pulishTime">2024-01-08 08:17:12</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;fc161c405aa643fcad22666eec25d1a6&#39;)"><span class="titleNum">18</span><div class="labelDiv"></div>测试1<span class="pulishTime">2024-01-05 15:36:30</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;4ec45223081f48ef9b68db65e83e9f6a&#39;)"><span class="titleNum">19</span><div class="labelDiv"></div>1月4日期末考试情况通报<span class="pulishTime">2024-01-05 14:33:14</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;d376de34ca1449d69927422ac728616f&#39;)"><span class="titleNum">20</span><div class="labelDiv"></div>英语考试班长无需报送“考试评价”数据<span class="pulishTime">2024-01-03 16:40:51</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;9a83a7961b964521a15ecb933e20bbb0&#39;)"><span class="titleNum">21</span><div class="labelDiv"></div>2023-2024-1期末考试排考通知<span class="pulishTime">2023-12-15 10:51:42</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;01188d5200af47d9b57dc5cb37010f36&#39;)"><span class="titleNum">22</span><div class="labelDiv"></div>2023-2024-1期末考试排考通知<span class="pulishTime">2023-12-15 10:51:31</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;21c63f7cea4b4e4bb75d7fac6e2fe93f&#39;)"><span class="titleNum">23</span><div class="labelDiv"></div>2023-2024-1期末考试排考通知<span class="pulishTime">2023-12-15 10:51:28</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;07fa3c5b52da4231be8e0765ddad4be2&#39;)"><span class="titleNum">24</span><div class="labelDiv"></div>2023-2024-1期末考试排考通知<span class="pulishTime">2023-12-15 10:51:25</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;1655cc34e981404d830bdd7f7fffcb30&#39;)"><span class="titleNum">25</span><div class="labelDiv"></div>2023-2024-1期末考试排考通知<span class="pulishTime">2023-12-15 10:51:11</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;63088fd130ce41dfbb77b06d5480000a&#39;)"><span class="titleNum">26</span><div class="labelDiv"></div>2023-2024-1期末考试排考通知<span class="pulishTime">2023-12-15 10:51:07</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;300034a75b5a4dbebb58d6bd971ff4c9&#39;)"><span class="titleNum">27</span><div class="labelDiv"></div>2023年12月大学外语四、六级考试考场分布<span class="pulishTime">2023-12-14 11:24:34</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;1d3d9485ea514b1eac200962632e1d7c&#39;)"><span class="titleNum">28</span><div class="labelDiv"></div>2023年12月大学外语四、六级考试考生考前须知<span class="pulishTime">2023-12-13 15:54:11</span></a></li></ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="Read">
+            <div class="container mp30">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="panel panel-default">
+                            
+                            
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div style="border-bottom: 1px dotted #ddd;height: 30px;line-height: 30px;">
+                                            <span class="demoNum">序号</span>
+                                            <span class="demoTitle">标题</span>
+                                            <span class="demoTime">日期</span>
+                                        </div>
+                                        <ul class="demo" id="demo2"><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;97213433e50446b7b7680e854dec5cc4&#39;)"><span class="titleNum">1</span><div class="labelDiv"></div>关于2023-2024学年第二学期通识选修课选课的通知<span class="pulishTime">2024-03-01 16:23:33</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;2712a205664b458c9002818a749d28d0&#39;)"><span class="titleNum">2</span><div class="labelDiv"></div>1月8日期末考试情况通报<span class="pulishTime">2024-01-08 17:01:06</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;109bffcae77740cba185c54beba18b20&#39;)"><span class="titleNum">3</span><div class="labelDiv"></div>2023年12月大学外语四、六级考试考生考前须知<span class="pulishTime">2023-12-14 11:10:07</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;dbfdfa8e4546482caef3979e15290dd5&#39;)"><span class="titleNum">4</span><div class="labelDiv"></div>2023-2024-1期末考试排考通知<span class="pulishTime">2023-11-19 11:31:31</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;877e11aac4c648809ff726a08473ea95&#39;)"><span class="titleNum">5</span><div class="labelDiv"></div>2023-2024-1期末考试排考通知<span class="pulishTime">2023-11-13 09:28:58</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;7847d00702c9450a8a1ec1935d2bcb7e&#39;)"><span class="titleNum">6</span><div class="labelDiv"></div>教师调换通知<span class="pulishTime">2023-09-26 09:32:55</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;d377009e539a46e59b5a5699cf15bcbc&#39;)"><span class="titleNum">7</span><div class="labelDiv"></div>2022-2023-2期末考试排考通知<span class="pulishTime">2023-06-26 12:33:50</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;d2c31822b0bb48d1a9e85fec0d775432&#39;)"><span class="titleNum">8</span><div class="labelDiv"></div>2022-2023-2期末考试排考通知<span class="pulishTime">2023-06-26 12:33:30</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;d9a94d4c1d7849cf91c7ba71f0b28e42&#39;)"><span class="titleNum">9</span><div class="labelDiv"></div>2022-2023-2期末考试排考通知<span class="pulishTime">2023-06-26 12:32:52</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;0c7bad82445b4e1e8aac17fb0b9e76ca&#39;)"><span class="titleNum">10</span><div class="labelDiv"></div>2022-2023-2期末考试排考通知<span class="pulishTime">2023-06-26 12:32:34</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;d276183ac0a14ef78101c331dec51a7b&#39;)"><span class="titleNum">11</span><div class="labelDiv"></div>2022-2023-2期末考试排考通知<span class="pulishTime">2023-06-26 12:03:33</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;37dc83caac0d4383b2f95b3645393f75&#39;)"><span class="titleNum">12</span><div class="labelDiv"></div>2022-2023-2期末考试排考通知<span class="pulishTime">2023-06-26 12:03:15</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;73e5630df1844cf581881637a79c0244&#39;)"><span class="titleNum">13</span><div class="labelDiv"></div>2022-2023-2期末考试排考通知<span class="pulishTime">2023-06-26 12:02:37</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;01441b5d151649c59e2191e1a1ec9aeb&#39;)"><span class="titleNum">14</span><div class="labelDiv"></div>2022-2023-2期末考试排考通知<span class="pulishTime">2023-06-26 12:02:18</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;2041207858c143f0a9c4b4d810c87231&#39;)"><span class="titleNum">15</span><div class="labelDiv"></div>2022-2023-2期末考试排考通知<span class="pulishTime">2023-06-26 11:59:35</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;736bce684a83400cbf2aac0b65dc70e1&#39;)"><span class="titleNum">16</span><div class="labelDiv"></div>2022-2023-2期末考试排考通知<span class="pulishTime">2023-06-26 11:59:15</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;b251409f2b0a4d299ff61f5fda403aaf&#39;)"><span class="titleNum">17</span><div class="labelDiv"></div>2022-2023-2期末考试排考通知<span class="pulishTime">2023-06-26 11:58:35</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;a129f50bad0047eba31f60addd7e1e82&#39;)"><span class="titleNum">18</span><div class="labelDiv"></div>2022-2023-2期末考试排考通知<span class="pulishTime">2023-06-26 11:58:17</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;aa9147a89b6a4248ac172a5c3f27ad35&#39;)"><span class="titleNum">19</span><div class="labelDiv"></div>2022-2023-2期末考试排考通知<span class="pulishTime">2023-06-26 11:04:19</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;cccbfb801ae847f2a725551146d988b1&#39;)"><span class="titleNum">20</span><div class="labelDiv"></div>2022-2023-2期末考试排考通知<span class="pulishTime">2023-06-26 11:03:54</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;2263c74cf53a4b1e857ee39a94ccd436&#39;)"><span class="titleNum">21</span><div class="labelDiv"></div>2022-2023-2期末考试排考通知<span class="pulishTime">2023-06-26 11:02:59</span></a></li><li class="news-item"><a href="javascript:void(0)" onclick="a(&#39;159e4c6a3fb74e568d28a38dd9704cad&#39;)"><span class="titleNum">22</span><div class="labelDiv"></div>2022-2023-2期末考试排考通知<span class="pulishTime">2023-06-26 11:02:38</span></a></li></ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+// $(function(){
+//         $("#demo").bootstrapNews({
+//             newsPerPage: 6,
+//             autoplay: false,
+//             onToDo: function () {
+//                 //console.log(this);
+//             }
+//         });
+//         $("#demo1").bootstrapNews({
+//             newsPerPage: 6,
+//             autoplay: false,
+//             onToDo: function () {
+//                 //console.log(this);
+//             }
+//         });
+//         $("#demo2").bootstrapNews({
+//             newsPerPage: 6,
+//             autoplay: false,
+//             onToDo: function () {
+//                 //console.log(this);
+//             }
+//         });
+//     });
+</script>
+<input type="hidden" id="adminPath" value="/admin">
+<!-- jqGrid curdtools-->
+		<script src="./curdtools_jqgrid.js.下载"></script>
+
+
+
+<div id="phraseJoinewrskdfdswerhnyikyofd" data-v-app=""><!----><!----><!----></div></body></html>

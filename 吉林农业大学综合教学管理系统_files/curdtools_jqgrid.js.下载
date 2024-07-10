@@ -1,0 +1,3145 @@
+﻿/*
+ * Copyright &copy; 2016-2020 <a href="http://www.jeeweb.cn/">JeeWeb</a> All rights reserved.
+ * 
+ * 通用公共方法
+ * @author 王存见
+ * @version 2016-12-04
+ */
+(function ($) {
+    $.fn.extend({
+        initForm: function (options) {
+            //默认参数
+            var defaults = {
+                jsonValue: options,
+                isDebug: false   //是否需要调试，这个用于开发阶段，发布阶段请将设置为false，默认为false,true将会把name value打印出来
+            }
+            //设置参数
+            var setting = defaults;
+            var tempForm = $("<form method='post' enctype='multipart/form-data'></form>");
+            $(document.body).append(tempForm);
+            jsonValue = setting.jsonValue;
+            //如果传入的json字符串，将转为json对象
+            if ($.type(setting.jsonValue) === "string") {
+                jsonValue = $.parseJSON(jsonValue);
+            }
+            //如果传入的json对象为空，则不做任何操作
+            if (!$.isEmptyObject(jsonValue)) {
+                var debugInfo = "";
+                $.each(jsonValue, function (key, value) {
+                    var tempInput = $("<input>");
+                    tempInput.attr("type", "hidden");
+                    tempInput.attr("name", key);
+                    tempInput.attr("value", value);
+                    tempForm.append(tempInput);
+                })
+            }
+            return tempForm;    //返回对象，提供链式操作
+        }
+    });
+})(jQuery)
+$.ajaxSetup({
+    complete: function (xhr, ts) {
+        if (xhr.responseJSON != null) {
+            var json = xhr.responseJSON;
+            if (json.ret == -2 && json.type == 0) {
+                top.layer.confirm(json.msg, {
+                    closeBtn: 0,
+                    btn: ['重新登录'] //按钮
+                }, function () {
+                    top.window.location.reload();
+                })
+            } else if (json.ret == -1 && json.type == 0) {
+                top.layer.confirm(json.msg, {
+                    btn: ['确定', '取消'] //按钮
+                }, function () {
+                    top.window.location.reload();
+                }, function () {
+                    top.layer.close(top.layer.index);
+                })
+            }
+        }
+    }
+});
+
+if(!String.prototype.hasOwnProperty("replaceAll")) {
+    String.prototype.replaceAll = function (pattern, replacement) {
+        return this.replace(new RegExp(pattern, "g"), replacement);
+    }
+}
+/**
+ * 新增事件打开窗口
+ * @param title 编辑框标题
+ * @param addurl//目标页面地址
+ */
+function create(title, url, gridid, width, height) {
+    openDialog(title, url, gridid, width, height);
+}
+
+/**
+ * 新增事件打开窗口
+ * @param title 编辑框标题
+ * @param addurl//目标页面地址
+ */
+function createDialog(title, url, gridid, width, height) {
+    openDialog(title, url, gridid, width, height);
+}
+
+
+/**
+ * 教学运行-指导计划-自定义按钮事件打开窗口
+ * 重写原因，可能需要做相关的数据判断
+ * @param title 编辑框标题
+ * @param addurl//目标页面地址
+ */
+function addPage(title, url, gridId, id, width, height, tipMsg) {
+    var url = preprocessUrl(url, id);
+    openAddPageModel(title, url, gridId, width, height);
+}
+
+/**
+ * 教学运行-指导计划-自定义按钮事件打开窗口
+ * 重写原因，可能需要做相关的数据判断
+ * @param title 编辑框标题
+ * @param addurl//目标页面地址
+ */
+function addPageQP(title, url, gridId, id, width, height, tipMsg) {
+    var url = preprocessUrl(url, id);
+    openAddPageModel(title, url, gridId, "700px", "450px");
+}
+
+/**
+ * 教学运行-指导计划-自定义按钮事件打开窗口
+ * 重写原因，可能需要做相关的数据判断
+ * @param title 编辑框标题
+ * @param addurl//目标页面地址
+ */
+function openAddPageModel(title, url, gridId, width, height) {
+    width = width ? width : '800px';
+    height = height ? height : '500px';
+    if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {//如果是移动端，就使用自适应大小弹窗
+        width = 'auto';
+        height = 'auto';
+    } else {//如果是PC端，根据用户设置的width和height显示。
+
+    }
+    top.layer.open({
+        type: 2,
+        area: [width, height],
+        title: title,
+        maxmin: true, //开启最大化最小化按钮
+        content: url,
+        btn: ['确定', '关闭'],
+        yes: function (index, layero) {
+            var body = top.layer.getChildFrame('body', index);
+            var iframeWin = layero.find('iframe')[0]; //得到iframe页的窗口对象，执行iframe页的方法：iframeWin.method();
+            //文档地址
+            //http://www.layui.com/doc/modules/layer.html#use
+            iframeWin.contentWindow.doSubmit(function () {
+                //判断逻辑并关闭
+                setTimeout(function () {
+                    top.layer.close(index)
+                }, 100);//延时0.1秒，对应360 7.1版本bug
+                //刷新表单
+                refreshTable(gridId);
+            });
+
+        },
+        cancel: function (index) {
+            
+        }
+    });
+}
+
+
+/**
+ * 更新事件打开窗口
+ * @param title 编辑框标题
+ * @param addurl//目标页面地址
+ * @param id//主键字段
+ */
+function update(title, url, gridId, width, height) {
+    var rowsData = SelectList;
+    var multiselect = $("#" + gridId).jqGrid('getGridParam', 'multiselect');
+    var rowData = $("#" + gridId).jqGrid('getGridParam', 'selrow');
+    if (!multiselect) {
+        if (rowData) {
+            rowsData[0] = rowData;
+        }
+    }
+    if (!rowsData || rowsData.length == 0) {
+        top.layer.alert('请至少选择一条数据!', {icon: 0, title: '警告'});
+        return;
+    }
+    if (rowsData.length > 1) {
+        top.layer.alert('只能选择一条数据!', {icon: 0, title: '警告'});
+        return;
+    }
+
+    var id = rowsData[0];
+    url = url.replace("{id}", id);
+    openDialog(title, url, gridId, width, height);
+}
+
+/**
+ * 更新事件打开窗口
+ * @param title 编辑框标题
+ * @param addurl//目标页面地址
+ * @param id//主键字段
+ */
+function updateDialog(title, url, gridId, width, height) {
+    var rowsData = SelectList;
+    var multiselect = $("#" + gridId).jqGrid('getGridParam', 'multiselect');
+    var rowData = $("#" + gridId).jqGrid('getGridParam', 'selrow');
+    if (!multiselect) {
+        if (rowData) {
+            rowsData[0] = rowData;
+        }
+    }
+    if (!rowsData || rowsData.length == 0) {
+        top.layer.alert('请至少选择一条数据!', {icon: 0, title: '警告'});
+        return;
+    }
+    if (rowsData.length > 1) {
+        top.layer.alert('只能选择一条数据!', {icon: 0, title: '警告'});
+        return;
+    }
+
+    var id = rowsData[0];
+    url = url.replace("{id}", id);
+    openDialog(title, url, gridId, width, height);
+}
+
+/**
+ * 多记录选择請求
+ * @param title
+ * @param url
+ * @param gname
+ * @return
+ */
+function toolbarSelectConfirm(title, url, gridId, tipMsg) {
+    if (tipMsg == undefined || tipMsg == '') {
+        tipMsg = "您确定要执行该操作！";
+    }
+    var ids = [];
+    var rows = SelectList;
+    var rowData = $("#" + gridId).jqGrid('getGridParam', 'selrow');
+    var multiselect = $("#" + gridId).jqGrid('getGridParam', 'multiselect');
+    if (!multiselect) {
+        if (rowData) {
+            rows[0] = rowData;
+        }
+    }
+    if (rows.length > 0) {
+        swal({
+            title: title + "提示",
+            text: tipMsg,
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "确定",
+            closeOnConfirm: false,
+            cancelButtonText: "取消",
+        }, function () {
+            for (var i = 0; i < rows.length; i++) {
+                ids.push(rows[i]);
+            }
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: {
+                    "ids": ids.toString()
+                },
+                cache: false,
+                success: function (d) {
+                    if (d.ret == 0) {
+                        var msg = d.msg;
+                        swal(title + "提示！", msg, "success");
+                        //刷新表单
+                        refreshTable(gridId);
+                    } else {
+                        var msg = d.msg;
+                        swal(title + "提示！", msg, "error");
+                    }
+                }
+            });
+        });
+        return;
+    } else {
+        top.layer.alert('请选择需要操作的数据!', {icon: 0, title: '警告'});
+        return;
+    }
+}
+
+//打开对话框(添加修改)
+function openDialog(title, url, gridId, width, height) {
+    width = width ? width : '800px';
+    height = height ? height : '500px';
+    if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {//如果是移动端，就使用自适应大小弹窗
+        width = 'auto';
+        height = 'auto';
+    } else {//如果是PC端，根据用户设置的width和height显示。
+
+    }
+    top.layer.open({
+        type: 2,
+        area: [width, height],
+        title: title,
+        maxmin: true, //开启最大化最小化按钮
+        content: url,
+        success: function (layero, index) {
+            //遍历父页面的button,使其失去焦点，再按enter键就不会弹框了
+            $(":button").each(function () {
+                $(this).blur();
+            });
+        },
+        btn: ['确定', '关闭'],
+        yes: function (index, layero) {
+            var body = top.layer.getChildFrame('body', index);
+            var iframeWin = layero.find('iframe')[0]; //得到iframe页的窗口对象，执行iframe页的方法：iframeWin.method();
+            //文档地址
+            //http://www.layui.com/doc/modules/layer.html#use
+            iframeWin.contentWindow.doSubmit(function () {
+                //判断逻辑并关闭
+                setTimeout(function () {
+                    top.layer.close(index)
+                }, 100);//延时0.1秒，对应360 7.1版本bug
+                SelectList = [];
+                //刷新表单
+                refreshTable(gridId);
+            });
+
+        },
+        cancel: function (index) {
+
+        }
+    });
+
+}
+
+/**
+ * 单条记录删除
+ * @param title
+ * @param url
+ * @param gname
+ * @return
+ */
+function deleteRowData(title, url, infoid, gridId, tipMsg) {
+    url = url.replace("{id}", infoid);
+    if (tipMsg == undefined || tipMsg == '') {
+        msg = "您确定要删除该信息么，请谨慎操作！";
+    }
+    swal({
+        title: "提示",
+        text: msg,
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "确定",
+        closeOnConfirm: false,
+        cancelButtonText: "取消",
+    }, function () {
+        $.ajax({
+            url: url,
+            type: 'post',
+            data: {
+                id: infoid
+            },
+            cache: false,
+            success: function (d) {
+                if (d.ret == 0) {
+                    var msg = d.msg;
+                    swal("提示！", msg, "success");
+                    SelectList = [];
+                    //刷新表单
+                    refreshTable(gridId);
+                } else {
+                    var msg = d.msg;
+                    swal("提示！", msg, "error");
+                }
+            }
+        });
+    });
+}
+
+/**
+ * 多记录刪除請求
+ * @param title
+ * @param url
+ * @param gname
+ * @return
+ */
+function batchDelete(title, url, gridId) {
+    var ids = [];
+    var rows = SelectList;
+    var rowData = $("#" + gridId).jqGrid('getGridParam', 'selrow');
+    var multiselect = $("#" + gridId).jqGrid('getGridParam', 'multiselect');
+    if (!multiselect) {
+        if (rowData) {
+            rows[0] = rowData;
+        }
+    }
+    if (rows.length > 0) {
+        swal({
+            title: "提示",
+            text: "您确定要删除这些信息么，请谨慎操作！",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "确定",
+            closeOnConfirm: false,
+            cancelButtonText: "取消",
+        }, function () {
+            for (var i = 0; i < rows.length; i++) {
+                ids.push(rows[i]);
+            }
+            $.ajax({
+                url: url,
+                type: 'post',
+                data: {
+                    ids: ids.join(',')
+                },
+                cache: false,
+                success: function (d) {
+                    if (d.ret == 0) {
+                        var msg = d.msg;
+                        swal("提示！", msg, "success");
+                        SelectList = [];
+                        //刷新表单
+                        refreshTable(gridId);
+                    } else {
+                        var msg = d.msg;
+                        swal("提示！", msg, "error");
+                    }
+                }
+            });
+        });
+        return;
+    } else {
+        top.layer.alert('请选择需要删除的数据!', {icon: 0, title: '警告'});
+        return;
+    }
+}
+
+/**
+ * 行内提示性操作
+ * @param title
+ * @param url
+ * @param gname
+ * @return
+ */
+function rowConfirm(title, url, infoid, gridId, tipMsg) {
+    url = url.replace("{id}", infoid);
+    if (tipMsg == undefined || tipMsg == '') {
+        tipMsg = "您确定要执行该操作！";
+    }
+    swal({
+        title: "提示",
+        text: tipMsg,
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "确定",
+        closeOnConfirm: false,
+        cancelButtonText: "取消",
+    }, function () {
+        $.ajax({
+            url: url,
+            type: 'post',
+            data: {
+                id: infoid
+            },
+            cache: false,
+            success: function (d) {
+                if (d.ret == 0) {
+                    var msg = d.msg;
+                    swal("提示！", msg, "success");
+                    //刷新表单
+                    refreshTable(gridId);
+                } else {
+                    var msg = d.msg;
+                    swal("提示！", msg, "error");
+                }
+            }
+        });
+    });
+}
+
+/*
+ * 搜索重置
+ */
+function reset(gridId) {
+
+    SelectList = [];
+    SelectDataList = [];
+    $("#" + gridId + "Query").find(":input").val("");
+    var nodearr = $("#" + gridId + "Query").find(".fs-dropdown").next(":input");
+    $(nodearr).each(function () {
+        $(this).reload();
+    })
+    // if(nodearr.length>0){
+    //     $(nodearr).reload();
+    // }
+    //运行搜索
+    search(gridId);
+}
+
+/*
+ * 搜索重置
+ */
+function resetExcludeHidden(gridId) {
+    SelectList = [];
+    SelectDataList = [];
+    $("#" + gridId + "Query").find(":input:visible").val("");
+    var nodearr = $("#" + gridId + "Query").find(".fs-dropdown").next(":input");
+    $(nodearr).each(function () {
+        $(this).reload();
+    })
+    search(gridId);
+}
+/**
+ * 设置
+ * @param {*} gridId 
+ * @param {*} successCallBack 弹窗打开后弹窗
+ * @param {*} fieldSetDoneCallBack 
+ */
+function setting(gridId, successCallBack, fieldSetDoneCallBack) {
+    var sfresizeHeight = ''
+    var url = $("#adminPath").val() + "/system/gridfield/toFieldBind";
+    //$("#" + gridId).setGridParam().hideCol("cjlrzt").trigger("reloadGrid");
+    var colModel = $("#" + gridId).jqGrid('getGridParam', 'colModel');
+    var jsonArr = "";
+    for (var i = 0; i < colModel.length; i++) {
+        if (colModel[i].name != null && colModel[i].label != null && !/^[a-zA-Z0-9]+$/.test(colModel[i].label)) {
+            // 针对湖工定制的-互认申请，学分互认审核，学生互认查询页---start
+            if (colModel[i].name == 'hrgxzList' && colModel[i].label.indexOf('</div>') != -1) {
+                colModel[i].label = '课程编号'
+            }
+            // 针对湖工定制的-互认申请，学分互认审核，学生互认查询页---end
+            jsonArr += colModel[i].name + ":" + colModel[i].label + ":" + colModel[i].hidden + ",";
+        }
+    }
+    //查询全部检索项
+    var allQuery = $("#" + gridId + "Query .form-inline").children();
+    var queryJsonArr = "";
+    for (var i = 0; i < allQuery.length; i++) {
+        var ishidden = $(allQuery[i]).css("display");
+        if (ishidden == "none") {
+            ishidden = "true";
+        } else {
+            ishidden = "false";
+        }
+        var ch = $(allQuery[i]).children();
+        var name = $(ch[0]).text();
+        if (name != null && name != "") {
+            var label = $(ch[1]).attr("name");
+            if (label == null || label == "") {
+                label = $($(ch[1]).children()[2]).attr("name");
+            }
+            queryJsonArr += name + "-" + label + "-" + ishidden + ",";
+        }
+    }
+    var gridUrl = $("#" + gridId).jqGrid("getGridParam", "url");
+    if (gridUrl.indexOf("?") > -1) {
+        gridUrl = gridUrl.substring(0, gridUrl.indexOf("?"));
+    }
+    url = url + "?gridId=" + gridId + "&gridurl=" + gridUrl;
+    var width = $("#gbox_" + gridId).width();
+    top.layer.open({
+        type: 2,
+        area: ["850px", "95%"],
+        title: "设置显示字段",
+        maxmin: false, //开启最大化最小化按钮
+        content: encodeURI(url),
+        success: function (layero, index) {
+            //遍历父页面的button,使其失去焦点，再按enter键就不会弹框了
+            $(":button").each(function () {
+                $(this).blur();
+            });
+            var iframeWin = layero.find('iframe')[0]; //得到iframe页的窗口对象，执行iframe页的方法：iframeWin.method();
+            iframeWin.contentWindow.initField(jsonArr, queryJsonArr);
+            if (successCallBack != '' && successCallBack != null && successCallBack != undefined && typeof successCallBack === 'function') {
+                successCallBack(layero)
+            }
+        },
+        btn: ['确定', '关闭'],
+        yes: function (index, layero) {
+            var iframeWin = layero.find('iframe')[0]; //得到iframe页的窗口对象，执行iframe页的方法：iframeWin.method();
+            iframeWin.contentWindow.saveGridField(function (fields, fieldsQuery, fieldsQuerySortArr) {
+                top.layer.close(index);
+                var colModel = $("#" + gridId).jqGrid('getGridParam', 'colModel');
+                for (var i = 0; i < colModel.length; i++) {
+                    if (colModel[i].name != null && colModel[i].label != null) {
+                        if(gridId=='jxjhzxjhGridIdGrid'){ // #48543先针对jxjhzxjhGridIdGrid这一个表格做下处理 将这个表格的动态列展示出来
+                            if(("," + fields + ",").indexOf("," + colModel[i].name + ",") != -1 || colModel[i].name.indexOf('zcxsitem_')!=-1){
+                                $("#" + gridId).setGridParam().showCol(colModel[i].name).trigger("reloadGrid");
+                            }else {+
+                                $("#" + gridId).setGridParam().hideCol(colModel[i].name).trigger("reloadGrid");
+                            }
+                        }else{
+                            if (("," + fields + ",").indexOf("," + colModel[i].name + ",") != -1) {
+                                $("#" + gridId).setGridParam().showCol(colModel[i].name).trigger("reloadGrid");
+                            } else {
+                                $("#" + gridId).setGridParam().hideCol(colModel[i].name).trigger("reloadGrid");
+                            }
+                        }
+                    }
+                }
+                // 新增 对jqGrid进行列字段排序 
+                let fieldsArr = fields.split(',')
+                if (Array.isArray(colModel)) {
+                    let newColIndex = []
+                    let newColModel = JSON.parse(JSON.stringify(colModel))
+                    // 1.排序
+                    newColModel.sort((a, b) => {
+                        const aIndex = fieldsArr.indexOf(a.name);
+                        const bIndex = fieldsArr.indexOf(b.name);
+                        if (aIndex !== -1 && bIndex !== -1) { // a和b都存在于str中
+                            return aIndex - bIndex;
+                        } else if (aIndex !== -1) { // 只有a存在于str中
+                            return -1;
+                        } else if (bIndex !== -1) { // 只有b存在于str中
+                            return 1;
+                        } else { // a和b都不存在于str中
+                            return 0;
+                        }
+                    })
+                    // 2.这个checkbox这一列，需要判断出来，一定要放在newColModel的第一个，否则会表格错乱
+                    let cbIndex = newColModel.findIndex((item) => {
+                        return item.name === 'cb' && !item.label
+                    })
+                    if (cbIndex !== -1) {
+                        let cbValue = newColModel.splice(cbIndex, 1)[0];
+                        newColModel.unshift(cbValue);
+                    }
+                    // 3.通过判断旧的列数据colModel 与 新的newColModel，获得一个index索引的顺序列表
+                    for (let i = 0; i < newColModel.length; i++) {
+                        const name = newColModel[i].name;
+                        const index = colModel.findIndex(col => col.name === name);
+                        newColIndex.push(index);
+                    }
+                    // 4.通过remapColumns方法传入index索引的顺序列表，重新排序
+                    $("#" + gridId).jqGrid('remapColumns', newColIndex, true, false, 'setting');// 顺序变化
+
+                    // 5.表体数据顺序已经改变，但是表头没有更新导致数据错乱，所以需要用这个方法更新表头
+                    $("#" + gridId).jqGrid("setGridParam", {colModel: newColModel}).trigger("reloadGrid");
+                    // let newColNames = $("#" + gridId).jqGrid('getGridParam', 'colNames');// 获取新表头
+                    // $("#" + gridId).jqGrid('setGridParam', { colNames: newColNames }).trigger('reloadGrid');
+                }
+
+                // 搜索栏排序 符合判断条件才会去执行排序
+                if (Array.isArray(fieldsQuerySortArr) && fieldsQuerySortArr.length > 0) {
+                    var queryForms = $("#" + gridId + "Query .form-inline")
+                    queryForms.each(function () {
+                        // 把正常的搜索栏中的form-group筛选出来，防止一些特殊内容影响排序结果
+                        if ($(this).find('.form-group').length > 0 && $(this).find('.form-group .form-control').length > 0) {
+                            var formItems = $(this).children('.form-group')
+                            formItems.detach()
+                            formItems.sort(function (a, b) {
+                                let aVal = fieldsQuerySortArr.indexOf($(a).find(".form-control").attr("name"));
+                                let bVal = fieldsQuerySortArr.indexOf($(b).find(".form-control").attr("name"));
+                                if (aVal !== -1 && bVal !== -1) { // a和b都存在于str中
+                                    return aVal - bVal;
+                                } else if (aVal !== -1) { // 只有a存在于str中
+                                    return -1;
+                                } else if (bVal !== -1) { // 只有b存在于str中
+                                    return 1;
+                                } else { // a和b都不存在于str中
+                                    return 0;
+                                }
+                            });
+                            // 排完序 重新添加一遍
+                            $(this).append(formItems)
+                        }
+                    })
+                }
+
+                // 处理搜索栏
+                var allQuery = $("#" + gridId + "Query .form-inline").children();
+
+                let queryLength = 0
+                for (var i = 0; i < allQuery.length; i++) {
+                    var ch = $(allQuery[i]).children();
+                    var label = $(ch[1]).attr("name");
+                    var name = $(ch[0]).text();
+                    if (name != null && name != "") {
+                        if (label == null || label == "") {
+                            label = $($(ch[1]).children()[2]).attr("name");
+                        }
+                        if (fieldsQuery != null && fieldsQuery != '' && ("," + fieldsQuery + ",").indexOf("," + label + ",") == -1) {
+                            $(allQuery[i]).hide();
+                        } else if (fieldsQuery != null && fieldsQuery != '' && ("," + fieldsQuery + ",").indexOf("," + label + ",") != -1) {
+                            // $(allQuery[i]).show();
+                            $(allQuery[i]).css('display', 'flex');
+                            queryLength++
+                            if (queryLength > 10) {
+                                $(allQuery[i]).css({'visibility': 'hidden'})
+                            } else {
+                                $(allQuery[i]).css({'visibility': 'visible'})
+                            }
+                        }
+                    }
+                }
+                let gqkzid = 'gqkz' + gridId.substr(0, gridId.length - 4);
+                if (queryLength > 10) {
+                    $("#" + gqkzid).css('visibility', 'visible');
+                } else {
+                    $("#" + gqkzid).css('visibility', 'hidden');
+                }
+                // 如果搜索栏中只有一个元素且是.form-inline元素，才回去对收缩功能做调整
+                if ($("#" + gridId + "Query").children().length === 1 && allQuery.length > 0) {
+                    let searchId = ''
+                    if (gridId.endsWith('Grid')) {
+                        searchId = gridId.slice(0, -4)
+                    }
+                    if (queryLength > 10) {
+                        searchId && $("#gqkz" + searchId).css({'visibility': 'visible'});
+
+                    } else {
+                        searchId && $("#gqkz" + searchId).css({'visibility': 'hidden'});
+                    }
+
+                    $("#gqkz" + searchId).removeClass('active')
+                    if (queryLength == 0) {
+                        $("#" + gridId + "Query").css("height", "0px");
+                    } else if (queryLength <= 5) {
+                        $("#" + gridId + "Query").css("height", "55px");
+                    } else {
+                        $("#" + gridId + "Query").css("height", "90px");
+                    }
+                }
+
+                if (typeof fieldSetDoneCallBack === 'function') {
+                    fieldSetDoneCallBack(layero)
+                    return
+                }
+                // 暂时先去除，因为整个页面重新加载，会导致用户已经设置好的筛选项又被清空
+                // window.location.reload(true);
+                $("#" + gridId).setGridWidth(width);
+                // $("#" + gridId).setGridWidth(width);
+            });
+            //去掉筛选更多，不再赋值90
+            if(sfresizeHeight=='true'){
+                resizeMoreHeight();
+            }
+        },
+        cancel: function (index) {
+
+        }
+    });
+
+}
+
+/**
+ *搜索
+ * @param gridId
+ */
+function search(gridId) {
+    // 跨页全选数据置为原始值
+    let jqGridId = gridId.slice(0,-4)
+    $(`#selectAll_${jqGridId}`).prop('checked',false)
+    window[`selectAll_${jqGridId}`] = false
+    window[`noSelList_${jqGridId}`] = []
+    $("#pager_"+jqGridId).find('.selected_count>.all_count_num').text(0)
+
+    top.window[`${gridId}_exportParam`] = null
+    window[`${jqGridId}_SelectList`] = []
+    SelectList = [];
+    SelectDataList = [];
+    var queryParams = {};
+    var queryFields = $('#queryFields').val();
+    queryParams['queryFields'] = queryFields;
+    //普通的查询
+    $('#' + gridId + "Query").find(":input").each(function () {
+        if (!isEmpty($(this).attr('name'))) {
+            var val = $(this).val();
+            if (val != null && val != '') {
+                val = val.toString();
+            }
+            if (val != null) {
+                if (val[0] < 1) {
+                    val = val.toString();
+                }
+            }
+            if (queryParams[$(this).attr('name')]) {
+                val = queryParams[$(this).attr('name')] + "," + val;
+            }
+            queryParams[$(this).attr('name')] = val;
+        }
+    });
+
+    // 普通的查询
+    $('#' + gridId + "Query").find(":input").each(function () {
+        var condition = $(this).attr('condition');
+        if (!condition) {
+            condition = "";
+        }
+        if (!isEmpty($(this).attr('name'))) {
+            var key = "query." + $(this).attr('name') + "||" + condition;
+            queryParams[key] = queryParams[$(this).attr('name')];
+        }
+    });
+    //刷新
+    //传入查询条件参数
+    var pageDom = $('#input_pager_' + jqGridId + ' .ui-pg-input')
+    $("#" + gridId).jqGrid('setGridParam', {
+        datatype: 'json',
+        postData: queryParams, //发送数据
+        page: 1
+    }).trigger("reloadGrid"); //重新载入
+}
+
+
+function returnQueryParams(gridId, type) {
+    var result = '';
+    var queryParams = {};
+    var queryFields = $('#queryFields').val();
+    queryParams['queryFields'] = queryFields;
+    //普通的查询
+    $('#' + gridId + "Query").find(":input").each(function () {
+        if (!isEmpty($(this).attr('name'))) {
+            var val = $(this).val();
+            if (val != null && val != '') {
+                val = val.toString();
+            }
+            if (queryParams[$(this).attr('name')]) {
+                val = queryParams[$(this).attr('name')] + "," + val;
+            }
+            queryParams[$(this).attr('name')] = val;
+        }
+    });
+    // 普通的查询
+    $('#' + gridId + "Query").find(":input").each(function () {
+        var condition = $(this).attr('condition');
+        if (!condition) {
+            condition = "";
+        }
+        if (!isEmpty($(this).attr('name'))) {
+            var key = "query." + $(this).attr('name') + "||" + condition;
+            queryParams[key] = queryParams[$(this).attr('name')];
+        }
+    });
+    var sort = $("#" + gridId).jqGrid('getGridParam', 'sortname');
+    queryParams["sort"] = sort;
+    result = $.param(queryParams);
+    if (type === 'export') {
+        result = ''
+        for (let key in queryParams) {
+            result += `${key}=${queryParams[key] || ''}&`
+        }
+        result = result.substring(0, result.length - 1)
+        result = result.length ? encodeURIComponent(result) : ''
+    }
+    return result;
+}
+
+function returnQueryParamsPost(gridId) {
+    var queryParams = {};
+    var queryFields = $('#queryFields').val();
+    queryParams['queryFields'] = queryFields;
+    //普通的查询
+    $('#' + gridId + "Query").find(":input").each(function () {
+        if (!isEmpty($(this).attr('name'))) {
+            var val = $(this).val();
+            if (val != null && val != '') {
+                val = val.toString();
+            }
+            if (queryParams[$(this).attr('name')]) {
+                val = queryParams[$(this).attr('name')] + "," + val;
+            }
+            queryParams[$(this).attr('name')] = val;
+        }
+    });
+    // 普通的查询
+    $('#' + gridId + "Query").find(":input").each(function () {
+        var condition = $(this).attr('condition');
+        if (!condition) {
+            condition = "";
+        }
+        if (!isEmpty($(this).attr('name'))) {
+            var key = "query." + $(this).attr('name') + "||" + condition;
+            queryParams[key] = queryParams[$(this).attr('name')];
+        }
+    });
+    var sort = $("#" + gridId).jqGrid('getGridParam', 'sortname');
+    queryParams["sort"] = sort;
+    return queryParams;
+}
+
+/**
+ *搜索 带页码
+ * @param gridId
+ */
+function searchHavingPageNum(gridId) {
+    SelectList = [];
+    SelectDataList = [];
+    var queryParams = {};
+    var queryFields = $('#queryFields').val();
+    queryParams['queryFields'] = queryFields;
+    var page = $('#' + gridId + "Query").getGridParam('page'); // current page
+    //普通的查询
+    $('#' + gridId + "Query").find(":input").each(function () {
+        if (!isEmpty($(this).attr('name'))) {
+            var val = $(this).val();
+            if (val != null && val != '') {
+                val = val.toString();
+            } else if (Array.isArray(val) && val.length == 1 && val[0] == '') {
+                val = [];
+            }
+            if (queryParams[$(this).attr('name')]) {
+                val = queryParams[$(this).attr('name')] + "," + $(this).val();
+            }
+            queryParams[$(this).attr('name')] = val;
+        }
+    });
+
+    // 普通的查询
+    $('#' + gridId + "Query").find(":input").each(function () {
+        var condition = $(this).attr('condition');
+        if (!condition) {
+            condition = "";
+        }
+        if (!isEmpty($(this).attr('name'))) {
+            var key = "query." + $(this).attr('name') + "||" + condition;
+            queryParams[key] = queryParams[$(this).attr('name')];
+        }
+    });
+    //刷新
+    //传入查询条件参数
+    $("#" + gridId).jqGrid('setGridParam', {
+        datatype: 'json',
+        postData: queryParams, //发送数据
+        page: page
+    }).trigger("reloadGrid"); //重新载入
+}
+
+
+/**
+ * 更新事件打开窗口
+ * @param title 编辑框标题
+ * @param addurl//目标页面地址
+ * @param id//主键字段
+ */
+function updateObj(title, url, gridId, id, width, height) {
+    url = preprocessUrl(url, id);
+    openDialog(title, url, gridId, width, height);
+}
+
+
+//打开对话框(查看)
+function openDialogDetailRefresh(title, url, gridId, width, height) {
+    if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {//如果是移动端，就使用自适应大小弹窗
+        width = 'auto';
+        height = 'auto';
+    } else {//如果是PC端，根据用户设置的width和height显示。
+
+    }
+    top.layer.open({
+        type: 2,
+        area: [width, height],
+        title: title,
+        maxmin: true, //开启最大化最小化按钮
+        content: url,
+        btn: ['关闭'],
+        cancel: function (index) {
+        },
+        end: function () {
+            //刷新表单
+            // refreshTable(gridId);
+            // 20221201 修改后固定在当前页
+            searchHavingPageNum(gridId)
+        }
+    });
+}
+
+//打开对话框(查看)
+function openDialogDetail(title, url, width, height) {
+    if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {//如果是移动端，就使用自适应大小弹窗
+        width = 'auto';
+        height = 'auto';
+    } else {//如果是PC端，根据用户设置的width和height显示。
+
+    }
+    top.layer.open({
+        type: 2,
+        area: [width, height],
+        title: title,
+        maxmin: true, //开启最大化最小化按钮
+        content: url,
+        btn: ['关闭'],
+        cancel: function (index) {
+
+        }
+    });
+}
+
+
+//打开对话框(查看)
+function openShowDetail(title, url, gridId, id, width, height) {
+    url = preprocessUrl(url, id);
+    if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {//如果是移动端，就使用自适应大小弹窗
+        width = 'auto';
+        height = 'auto';
+    } else {//如果是PC端，根据用户设置的width和height显示。
+
+    }
+    top.layer.open({
+        type: 2,
+        area: [width, height],
+        title: title,
+        maxmin: true, //开启最大化最小化按钮
+        content: url,
+        btn: ['关闭'],
+        cancel: function (index) {
+
+        }
+    });
+}
+
+/***行內操作的一些内置方法*/
+
+
+
+//打开对话框(添加修改)
+function rowDialog(title, url, gridId, id, width, height) {
+    var url = preprocessUrl(url, id);
+    openDialog(title, url, gridId, width, height);
+}
+
+//打开对话框(查看)
+function rowDialogDetailRefresh(title, url, gridId, id, width, height) {
+    var url = preprocessUrl(url, id);
+    openDialogDetailRefresh(title, url, gridId, width, height);
+}
+
+//打开对话框(查看)
+function rowDialogDetailForView(title, url, gridId, id, width, height) {
+    openDialogDetail(title, url, width, height);
+}
+
+//打开对话框(查看)
+function rowDialogDetail(title, url, gridId, id, width, height) {
+    var url = preprocessUrl(url, id);
+    openDialogDetail(title, url, width, height);
+}
+
+function refreshTable(gridId) {
+    search(gridId);
+}
+
+function refreshTableHaveingPageNum(gridId) {
+    searchHavingPageNum(gridId);
+}
+
+function preprocessUrl(url, id) {
+    if (url.indexOf("{id}") > 0) {
+        url = url.replace("{id}", id);
+        return url;
+    } else {
+        if (isContains(url, "?id=") || isContains(url, "&id=")) {
+            return url;
+        }
+        if (url.indexOf("?") != -1) {
+            return url + "&id=" + id;
+        } else {
+            return url + "?id=" + id;
+        }
+    }
+}
+
+function isContains(str, substr) {
+    return str.indexOf(substr) >= 0;
+}
+
+/**
+ * 查看详细事件打开窗口
+ * @param title 查看框标题
+ * @param addurl//目标页面地址
+ * @param id//主键字段
+ */
+function detail(title, url, gridId, width, height) {
+    var rowsData = $("#" + gridId).bootstrapTable('getSelections');
+    if (!rowsData || rowsData.length == 0) {
+        top.layer.alert('请至少选择一条数据!', {icon: 0, title: '警告'});
+        return;
+    }
+    if (rowsData.length > 1) {
+        top.layer.alert('只能选择一条数据!', {icon: 0, title: '警告'});
+        return;
+    }
+
+    var id = rowsData[0].id;
+    ;
+    openDialogView(title, url + "&id=" + id, "800px", "500px", "");
+}
+
+// add start hanzongyuan 2018-06-20 导出
+/**
+ * 导出方法，jsp直接写exportData
+ */
+function exportData(title, url, gridId, width, height) {
+    exportDataCommon(gridId, url);
+}
+
+/**
+ * 导出调用方法
+ */
+function exportDataCommon(gridId, url) {
+    // 新建form
+    var rows = SelectList;
+    var tempForm = $("<form method='post' enctype='multipart/form-data'></form>");
+    tempForm.attr("action", url);
+    $(document.body).append(tempForm);
+    //如果有勾选项
+    if (rows.length > 0) {
+        var ids = rows.join(',');
+        var tempInput = $("<input>");
+        tempInput.attr("type", "hidden");
+        tempInput.attr("name", "ids");
+        tempInput.attr("value", ids);
+        tempForm.append(tempInput);
+    }
+    var colModel = $("#" + gridId).jqGrid('getGridParam', 'colModel');
+    var fields = "";
+    if (colModel != undefined) {
+        for (var i = 0; i < colModel.length; i++) {
+            if (!colModel[i].hidden && colModel[i].label != null) {
+                if ((isAllEnglish(colModel[i].name) && isAllEnglish(colModel[i].label)) || colModel[i].name == 'opt') {
+                    continue;
+                }
+                fields += colModel[i].name + ",";
+            }
+        }
+    }
+    var tempInput1 = $("<input>");
+    tempInput1.attr("type", "hidden");
+    tempInput1.attr("name", "fields");
+    tempInput1.attr("value", fields);
+    tempForm.append(tempInput1);
+    // console.log("fields:" + fields);
+    // 循环页面查询条件，将信息写入到form的input中隐藏
+    // 页面的查询条件
+    $('#' + gridId + "Query").find(":input").each(function () {
+        var tempInput = $("<input>");
+        tempInput.attr("type", "hidden");
+        tempInput.attr("name", $(this).attr('name'));
+        tempInput.attr("value", $(this).val());
+        tempForm.append(tempInput);
+    });
+    var sort = $("#" + gridId).jqGrid('getGridParam', 'sortname');
+    var sortInput = $("<input>");
+    sortInput.attr("type", "hidden");
+    sortInput.attr("name", "sort");
+    sortInput.attr("value", sort);
+    tempForm.append(sortInput);
+    var order = $("#" + gridId).jqGrid('getGridParam', 'sortorder');
+    var sortorder = $("<input>");
+    sortorder.attr("type", "hidden");
+    sortorder.attr("name", "order");
+    sortorder.attr("value", order);
+    tempForm.append(sortorder);
+    tempForm.submit();
+}
+
+function exportDataCommonByGird(title, url, gridId, width, height) {
+    // 新建form
+    let data = $("#" + gridId)[0].p.postData
+    var rows = SelectList;
+    //如果有勾选项
+    if (rows.length > 0) {
+        var ids = rows.join(',');
+        data.ids = ids;
+    }
+    var colModel = $("#" + gridId).jqGrid('getGridParam', 'colModel');
+    var fields = "";
+    if (colModel != undefined) {
+        for (var i = 0; i < colModel.length; i++) {
+            if (!colModel[i].hidden && colModel[i].label != null) {
+                fields += colModel[i].name + ",";
+            }
+        }
+    }
+    var sort = $("#" + gridId).jqGrid('getGridParam', 'sortname');
+    data.sort = sort;
+    var order = $("#" + gridId).jqGrid('getGridParam', 'sortorder');
+    data.order = order;
+    data.fields = fields;
+    var tempForm = $.fn.initForm(data);
+    tempForm.attr("action", url);
+    tempForm.submit();
+}
+
+/**
+ * 弹出页面，只有关闭按钮
+ */
+function excelPage(title, url, gridId, width, height) {
+    width = width ? width : '800px';
+    height = height ? height : '500px';
+    if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {//如果是移动端，就使用自适应大小弹窗
+        width = 'auto';
+        height = 'auto';
+    } else {//如果是PC端，根据用户设置的width和height显示。
+
+    }
+    top.layer.open({
+        type: 2,
+        area: [width, height],
+        title: title,
+        maxmin: true, //开启最大化最小化按钮
+        content: url,
+        btn: ['关闭'],
+        cancel: function (index) {
+            refreshTable(gridId);
+            layer.closeAll();
+        },
+        end: function () {
+            refreshTable(gridId);
+            layer.closeAll();
+        }
+    });
+}
+
+function uploadExcel(fileId, tipsId, buttonId, uploadUrl, adminUrl, errcode, errmsg) {
+    if ($("#" + fileId).val() == "") {
+        $("#" + tipsId).html('<p class="uploadExcelTips errorTips">请选择需要上传的Excel文件。</p>');
+    } else {
+        top.layer.load(2);
+        $("#" + buttonId).attr("disabled", true);
+        $("#" + tipsId).html("");
+        $("#progress-bar").width("2%");
+        $("#" + tipsId).append('<p class="uploadExcelTips">文档校验中……</p>');
+        $("#" + tipsId).append('<p class="uploadExcelTips">文档校验成功。</p>');
+        $("#" + tipsId).append('<p class="uploadExcelTips">正在导入，请稍候……</p>');
+        var formData = new FormData();
+        formData.append("file", document.getElementById(fileId).files[0]);
+        // 开始ajax上传文件
+        $.ajax({
+            url: uploadUrl,
+            type: "POST",
+            data: formData,
+            //async: false,
+            cache: false,
+            /**
+             *必须false才会自动加上正确的Content-Type
+             */
+            contentType: false,
+            /**
+             * 必须false才会避开jQuery对 formdata 的默认处理
+             * XMLHttpRequest会对 formdata 进行正确的处理
+             */
+            processData: false,
+            // 处理成功，下载失败列表
+            success: function (data) {
+                $("#" + tipsId).html('')
+                top.layer.close(top.layer.load(2));
+                if ("null" == data) {
+                    $("#" + tipsId).html('<p class="uploadExcelTips errorTips">上传的Excel文件没有数据。</p>');
+                    $("#progress-bar").width("100%");
+                    $("#" + buttonId).attr("disabled", false);
+                    return;
+                } else if ("success" == data) {
+                    $("#" + tipsId).append('<p class="uploadExcelTips successTips">数据全部导入成功！</p>');
+                    $("#progress-bar").width("100%");
+                } else if (errcode == data) {
+                    $("#" + tipsId).html('<p class="uploadExcelTips errorTips">' + errmsg + '</p>');
+                    $("#progress-bar").width("100%");
+                    $("#" + buttonId).attr("disabled", false);
+                    return;
+                } else {
+                    $("#" + tipsId).append('<p class="uploadExcelTips errorTips">部分数据导入失败！</p>');
+                    $("#progress-bar").width("100%");
+
+                    var jsonData = $.parseJSON(data);
+                    top.layer.confirm('你有未导入成功的数据,共[ ' + jsonData.errorSize + ' ]条,是否下载查看？',
+                        {btn: ['是', '否']},
+                        function (index) {
+                            exportDataFileByUrl(adminUrl, jsonData.fileName, jsonData.exportFileName);
+                            $("#" + tipsId).html('<p class="uploadExcelTips successTips">未导入成功数据下载成功，请处理后重新导入</p>');
+                            top.layer.close(index);
+                        },
+                        function () {
+                            $.ajax({
+                                url: adminUrl + "/system/attachment/deleteByFileName",
+                                type: "POST",
+                                data: {errorFile: jsonData.fileName},
+                                async: false,
+                                success: function (result) {
+                                    top.layer.close(top.layer.load(2));
+                                    top.layer.closeAll();
+                                }
+                            });
+                        });
+                    // TODO 删除错误文件
+
+                }
+            },
+            // 处理失败
+            error: function () {
+                $("#" + tipsId).html('')
+                top.layer.close(top.layer.load(2));
+                $("#" + tipsId).html('<p class="uploadExcelTips errorTips">数据导入失败！</p>');
+            }
+        });
+        $("#" + buttonId).attr("disabled", false);
+    }
+}
+
+var load1;
+
+function asynUploadExcel(fileId, tipsId, buttonId, uploadUrl, adminUrl, errcode, errmsg) {
+    if ($("#" + fileId).val() == "") {
+        $("#" + tipsId).html('<p class="uploadExcelTips errorTips">请选择需要上传的Excel文件。</p>');
+    } else {
+        load1 = top.layer.load(2);
+        $("#" + buttonId).attr("disabled", true);
+        $("#" + tipsId).html("");
+        $("#progress-bar").width("2%");
+        $("#" + tipsId).append('<p class="uploadExcelTips">文档校验中……</p>');
+        $("#" + tipsId).append('<p class="uploadExcelTips">文档校验成功。</p>');
+        $("#" + tipsId).append('<p class="uploadExcelTips">正在导入，请稍候……</p>');
+        var formData = new FormData();
+        formData.append("file", document.getElementById(fileId).files[0]);
+        // 开始ajax上传文件
+        $.ajax({
+            url: uploadUrl,
+            type: "POST",
+            data: formData,
+            //async: false,
+            cache: false,
+            /**
+             *必须false才会自动加上正确的Content-Type
+             */
+            contentType: false,
+            /**
+             * 必须false才会避开jQuery对 formdata 的默认处理
+             * XMLHttpRequest会对 formdata 进行正确的处理
+             */
+            processData: false,
+            // 处理成功，下载失败列表
+            success: function (uuid) {
+                $("#" + tipsId).html('')
+                if ("null" == uuid) {
+                    $("#" + tipsId).html('<p class="uploadExcelTips errorTips">上传的Excel文件没有数据。</p>');
+                    $("#progress-bar").width("100%");
+                    return;
+                }
+                var timer = setInterval(function () {
+                    $.ajax({
+                        url: adminUrl + "/system/gridfield/findResult",
+                        data: {
+                            uuid: uuid
+                        },
+                        success: function (data) {
+                            if (data != null && data != "") {
+                                clearInterval(timer);
+                                if ("success" == data) {
+                                    $("#" + tipsId).append('<p class="uploadExcelTips successTips">数据全部导入成功！</p>');
+                                    $("#progress-bar").width("100%");
+                                } else if (errcode == data) {
+                                    $("#" + tipsId).html('<p class="uploadExcelTips errorTips">' + errmsg + '</p>');
+                                    $("#progress-bar").width("100%");
+                                    return;
+                                } else {
+                                    $("#" + tipsId).append('<p class="uploadExcelTips errorTips">部分数据导入失败！</p>');
+                                    $("#progress-bar").width("100%");
+                                    console.log(data);
+                                    var jsonData = $.parseJSON(data);
+                                    top.layer.confirm('你有未导入成功的数据,共[ ' + jsonData.errorSize + ' ]条,是否下载查看？',
+                                        {btn: ['是', '否']},
+                                        function (index) {
+                                            exportDataFileByUrl(adminUrl, jsonData.fileName, jsonData.exportFileName);
+                                            $("#" + tipsId).html('<p class="uploadExcelTips successTips">未导入成功数据下载成功，请处理后重新导入</p>');
+                                            top.layer.close(index);
+                                        },
+                                        function () {
+                                            $.ajax({
+                                                url: adminUrl + "/system/attachment/deleteByFileName",
+                                                type: "POST",
+                                                data: {errorFile: jsonData.fileName},
+                                                async: false,
+                                                success: function (result) {
+                                                    top.layer.closeAll();
+                                                }
+                                            });
+                                        });
+                                }
+                            }
+                        },
+                        complete: function () {
+                            top.layer.close(load1)
+                            $('#' + buttonId).attr('disabled', false)
+                        },
+                        error: function () {
+                            top.layer.close(load1)
+                            $('#' + buttonId).attr('disabled', false)
+                        }
+                    });
+                }, 2000);
+            },
+            // 处理失败
+            error: function () {
+                top.layer.close(load1)
+                $('#' + buttonId).attr('disabled', false)
+                $("#" + tipsId).html('')
+                $("#" + tipsId).html('<p class="uploadExcelTips errorTips">数据导入失败！</p>');
+            }
+        });
+    }
+}
+
+//打开对话框(添加修改)
+function openDialogReloadParent(title, url, gridId, width, height) {
+    width = width ? width : '800px';
+    height = height ? height : '500px';
+    if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {//如果是移动端，就使用自适应大小弹窗
+        width = 'auto';
+        height = 'auto';
+    } else {//如果是PC端，根据用户设置的width和height显示。
+
+    }
+    top.layer.open({
+        type: 2,
+        area: [width, height],
+        title: title,
+        maxmin: true, //开启最大化最小化按钮
+        content: url,
+        success: function (layero, index) {
+            //遍历父页面的button,使其失去焦点，再按enter键就不会弹框了
+            $(":button").each(function () {
+                $(this).blur();
+            });
+        },
+        btn: ['确定', '关闭'],
+        yes: function (index, layero) {
+            var body = top.layer.getChildFrame('body', index);
+            var iframeWin = layero.find('iframe')[0]; //得到iframe页的窗口对象，执行iframe页的方法：iframeWin.method();
+            //文档地址
+            //http://www.layui.com/doc/modules/layer.html#use
+            iframeWin.contentWindow.doSubmit(function () {
+                setTimeout(function () {
+                    top.layer.close(index);
+                    window.location.reload();
+                }, 100);//延时0.1秒，对应360 7.1版本bug
+            });
+
+        },
+        cancel: function (index) {
+
+        }
+    });
+
+}
+
+
+//打开对话框(添加修改)
+function exportRecord(title, url, gridId, width, height) {
+    width = width ? width : '800px';
+    height = height ? height : '500px';
+    if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {//如果是移动端，就使用自适应大小弹窗
+        width = 'auto';
+        height = 'auto';
+    } else {//如果是PC端，根据用户设置的width和height显示。
+
+    }
+    var adminPath = $("#adminPath").val();
+    url = adminPath + "/system/systemfiledownload/listpage?type=" + url
+    top.layer.open({
+        type: 2,
+        area: [width, height],
+        title: title,
+        maxmin: true, //开启最大化最小化按钮
+        content: url,
+        success: function (layero, index) {
+            //遍历父页面的button,使其失去焦点，再按enter键就不会弹框了
+            $(":button").each(function () {
+                $(this).blur();
+            });
+        },
+        btn: ['关闭'],
+        cancel: function (index) {
+
+        }
+    });
+
+}
+
+function syncExportData(title, url, gridId, id, w, h) {
+    var ids = SelectList;
+    var params = returnQueryParamsPost(gridId);
+    if (ids != null && ids.length != 0) {
+        params.id = ids.toString();
+    }
+    var loadIndex = top.layer.load();
+    $.ajax({
+        type: 'post',
+        url: url,
+        datatype: 'json',
+        data: params,
+        success: function (data) {
+            top.layer.close(loadIndex);
+            swal("数据准备中…", "完成导出后我们将会将数据保存在“导出记录”中，请稍后下载即可", "success");
+        }
+    });
+}
+
+/**
+ * 导出调用方法，直接根据URL导出，一般是用于导入的错误数据导出
+ */
+function exportDataFileByUrl(adminUrl, fileName, exportFileName) {
+    // 新建form
+    var tempForm = $("<form method='post' enctype='multipart/form-data'></form>");
+    tempForm.attr("action", adminUrl + "/system/attachment/downloadByFileName");
+    $(document.body).append(tempForm);
+
+    var errorFile = $("<input>");
+    errorFile.attr("type", "hidden");
+    errorFile.attr("name", "errorFile");
+    errorFile.attr("value", fileName);
+    tempForm.append(errorFile);
+    var exportFile = $("<input>");
+    exportFile.attr("type", "hidden");
+    exportFile.attr("name", "exportFileName");
+    exportFile.attr("value", exportFileName);
+    tempForm.append(exportFile);
+
+    tempForm.submit();
+}
+
+
+function isEmpty(obj) {
+    if (typeof obj === "undefined" || obj === null || obj === "") {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+//add end hanzongyuan 2018-06-20 导出
+
+/**
+ * 获取cookie的函数
+ *
+ * @param cname
+ * @returns {string}
+ */
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+        var c = ca[i].trim();
+        if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
+    }
+    return "";
+}
+
+/**
+ * 页面加载时获取因英文对照表和语言设置
+ * 若语言设置为英文则调用translation方法
+ *
+ */
+$(function () {
+    allJqgrid()
+    var yysz = getCookie("yysz");
+    var transMap;
+    var adminPath = $("#adminPath").val();
+    if (adminPath == undefined || adminPath == "") {
+        return false;
+    }
+    $.ajax({
+        type: "GET",
+        url: adminPath + "/system/gridfield/getTranslation",
+        dataType: "json",
+        data: {
+            yysz: yysz
+        },
+        async: true,
+        success: function (data) {
+            //yysz = data.extend.yysz;
+            if (data.ret != -1) {
+                transMap = data.extend.transMap;
+                if (transMap == null || transMap.length == 0) {
+                    return;
+                }
+                translation(transMap);
+            }
+        }
+    });
+    //console.log(yysz);
+    //for (var key in transMap){ console.log(key + " == "+ transMap[key]); }
+
+
+    //页面放大
+    var item = window.localStorage.getItem("fd");
+    if (item == "fd") {
+        var $head = $("head");
+        $head.append($("<link/>", {
+            rel: "stylesheet",
+            id: "changesize02",
+            href: "/static/common/css/big_size.css",
+            type: "text/css"
+        }));
+        $head.append($("<link/>", {
+            rel: "stylesheet",
+            id: "changeSize01",
+            href: "/static/common/css/bigSize_body.css",
+            type: "text/css"
+        }));
+    }
+})
+function translation1(){ //给没有jqgrid表格的页面用的 页面加载完后再通过接口返回成功后用js拼接页面的
+    var yysz = getCookie("yysz");
+    var transMap;
+    var adminPath = $("#adminPath").val();
+    if (adminPath == undefined || adminPath == "") {
+        return false;
+    }
+    $.ajax({
+        type: "GET",
+        url: adminPath + "/system/gridfield/getTranslation",
+        dataType: "json",
+        data: {
+            yysz: yysz
+        },
+        async: true,
+        success: function (data) {
+            if (data.ret != -1) {
+                transMap = data.extend.transMap;
+                if (transMap == null || transMap.length == 0) {
+                    return;
+                }
+                translationAllHtml(transMap, document.children);
+            }
+        }
+    });
+}
+/**
+ * 将界面中所有在中英文对照表出现的中文都替换成相应的英文
+ *
+ * @param transMap
+ */
+function translation(transMap) {
+    //正则表达式匹配中文
+    //var chinese = /[\u4e00-\u9fa5]+/g;
+    //获取所有搜索条件
+    var selectCondition = $(".form-group").find("label");
+    //替换搜索条件(注意处理结尾的冒号)
+    for (let i = 0; i < selectCondition.length; i++) {
+        if($(selectCondition[i]).attr('self-been-translated') === 'true') {
+            continue;
+        }
+        let key = selectCondition[i].innerText;
+        let colon_zh = key.indexOf('：');
+        let colon_en = key.indexOf(':');
+        let star = key.indexOf('*');
+        if (star != -1) key = key.substr(star + 1);
+        if (colon_en != -1 || colon_zh != -1) key = key.substr(0, key.length - 1);
+        //console.log(key);
+        if (transMap[key] != '' && transMap[key] != null) {
+            let temp = transMap[key];
+            selectCondition[i].innerText = "";
+            if (star != -1) {
+                let red_Star = document.createElement("font");
+                red_Star.setAttribute("color", "red");
+                red_Star.innerText = "*";
+                selectCondition[i].appendChild(red_Star);
+            }
+            if (colon_en != -1 || colon_zh != -1) {
+                let content = document.createElement("span");
+                content.innerText = temp + "：";
+                selectCondition[i].appendChild(content);
+                $(selectCondition[i]).attr('self-been-translated', 'true')
+            }
+        }
+    }
+
+    //获取所有按钮内容
+    var button = $(".col-sm-12").find("button");
+    //替换按钮内容(注意处理开头的空格)
+    for (let i = 0; i < button.length; ++i) {
+        if($(button[i]).attr('self-been-translated') === 'true') {
+            continue;
+        }
+        let key = button[i].innerText.trim();
+        //console.log(key);
+        if (transMap[key] != '' && transMap[key] != null) {
+            //console.log("不为空的键:" + key);
+            button[i].innerText = " " + transMap[key];
+            $(button[i]).attr('self-been-translated', 'true')
+        }
+    }
+
+    //获取所有数据表表头
+    var header = $(".ui-jqgrid-hdiv").find(".ui-th-div");
+    //替换表头
+    for (let i = 0; i < header.length; ++i) {
+        if($(header[i]).attr('self-been-translated') === 'true') {
+            continue;
+        }
+        let key = header[i].innerText;
+        //console.log(key);
+        if (transMap[key] != '' && transMap[key] != null) {
+            // header[i].innerText = transMap[key];
+            // 支持#38081 当jqgrid表格表头又默认排序时，翻译的时候要把排序的html结构也加上
+            if ($(header[i]).find('span.s-ico').length != 0 && $(header[i]).find('div.sort-order-flag').length != 0) {
+                header[i].innerHTML = transMap[key] + '<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-sort-ltr ui-disabled glyphicon glyphicon-triangle-top"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-sort-ltr ui-disabled glyphicon glyphicon-triangle-bottom"></span></span><div class="sort-order-flag" title="此数字表示排序优先级" style="display:none"></div>'
+            } else {
+                header[i].innerText = transMap[key];
+            }
+            $(header[i]).attr('self-been-translated', 'true')
+        }
+    }
+
+    //获取学生卡片表头
+    var card = $(".table").find("label");
+    //替换学生卡片表头
+    for (let i = 0; i < card.length; ++i) {
+        if($(card[i]).attr('self-been-translated') === 'true') {
+            continue;
+        }
+        let key = card[i].innerText;
+        let colon_zh = key.indexOf('：');
+        let colon_en = key.indexOf(':');
+        let star = key.indexOf('*');
+        if (star != -1) key = key.substr(star + 1);
+        if (colon_en != -1 || colon_zh != -1) key = key.substr(0, key.length - 1);
+        //console.log(key + "==" + key.length);
+        if (transMap[key] != '' && transMap[key] != null) {
+            let temp = transMap[key];
+            if (colon_en != -1 || colon_zh != -1) {
+                temp = temp + "：";
+            }
+            if (star != -1) {
+                temp = "*" + temp;
+            }
+            card[i].innerText = temp;
+            $(card[i]).attr('self-been-translated', true)
+        }
+    }
+
+    //获取我的课表表头
+    var my_schedule = $(".thtext");
+    //替换
+    for (let i = 0; i < my_schedule.length; ++i) {
+        if($(my_schedule[i]).attr('self-been-translated') === 'true') {
+            continue;
+        }
+        let key = my_schedule[i].innerText;
+        //console.log(key + "==" + key.length);
+        if (transMap[key] != '' && transMap[key] != null) {
+            let temp = transMap[key];
+            my_schedule[i].innerText = temp;
+            $(my_schedule[i]).attr('self-been-translated', 'true')
+        }
+    }
+
+    //获取校历表头
+    var school_calendar = $(".table").find("th");
+    //替换
+    for (let i = 0; i < school_calendar.length; ++i) {
+        if($(school_calendar[i]).attr('self-been-translated') === 'true') {
+            continue;
+        }
+        let key = school_calendar[i].innerText;
+        //console.log(key + "==" + key.length);
+        if (transMap[key] != '' && transMap[key] != null) {
+            let temp = transMap[key];
+            school_calendar[i].innerText = temp;
+            $(school_calendar[i]).attr('self-been-translated', 'true')
+        }
+    }
+
+    //获取学业进程表格
+    var progress = $(".format");
+    //console.log(progress);
+    //替换
+    for (let i = 0; i < progress.length; ++i) {
+        if($(progress[i]).attr('self-been-translated') === 'true') {
+            continue;
+        }
+        let key = progress[i].innerText;
+        //console.log(key + "==" + key.length);
+        if (transMap[key] != '' && transMap[key] != null) {
+            let temp = transMap[key];
+            progress[i].innerText = temp;
+            $(progress[i]).attr('self-been-translated', 'true')
+        }
+    }
+    //利用递归 便利全部html
+    var child = document.children;
+    translationAllHtml(transMap, child);
+}
+
+
+function translationAllHtml(transMap, obj) {
+    for (var i = 0; i < obj.length; i++) {
+        if (obj[i].tagName != 'SCRIPT' && obj[i].tagName != 'META' && obj[i].tagName != 'LINK' && obj[i].tagName != 'STYLE') {
+            if($(obj[i]).attr('self-been-translated') === 'true') {
+                continue;
+            }
+            if (obj[i].children) {//当当前元素还存在子元素的时候,递归
+                translationAllHtml(transMap, obj[i].children);
+            }
+            // let key = obj[i].innerText;
+            let key = getElementTextWithoutChildren(obj[i]);
+            if (!isEmpty(key)) {
+                key = key.trim();
+                //判断是否是字段
+                var ds = $(obj[i]).attr("aria-describedby");
+                if (ds != null && ds != '' && (ds == 'groupGridIdGrid_dictname' || ds == 'groupGridIdGrid_dictcode')) {
+                    continue;
+                }                
+                let colon_zh = key.indexOf('：');
+                let colon_en = key.indexOf(':');
+                let star = key.indexOf('*');
+                if (star != -1) key = key.substr(star + 1);
+                if (colon_en != -1 || colon_zh != -1) key = key.substr(0, key.length - 1);
+                if (transMap[key] != '' && transMap[key] != null) {
+                    let temp = transMap[key];
+                    if (colon_en != -1 || colon_zh != -1) {
+                        temp = temp + "：";
+                    }
+                    if (star != -1) {
+                        temp = "*" + temp;
+                    }
+                    // 支持#36907 当jqgrid表格表头又默认排序时，翻译的时候要把排序的html结构也加上
+                    if ($(obj[i]).find('span.s-ico').length != 0 && $(obj[i]).find('div.sort-order-flag').length != 0) {
+                        obj[i].innerHTML = temp + '<span class="s-ico" style="display:none"><span sort="asc" class="ui-grid-ico-sort ui-icon-asc ui-sort-ltr ui-disabled glyphicon glyphicon-triangle-top"></span><span sort="desc" class="ui-grid-ico-sort ui-icon-desc ui-sort-ltr ui-disabled glyphicon glyphicon-triangle-bottom"></span></span><div class="sort-order-flag" title="此数字表示排序优先级" style="display:none"></div>'
+                    } else if (obj[i].className === 'openCloseBtn') { // 支持 #53316 广州交通-排课管理-手动智能排课 只替换节点的文本内容
+                        $(obj[i]).contents().each(function() {if (this.nodeType === Node.TEXT_NODE) {$(this).replaceWith(temp);}})
+                    } else {
+                        obj[i].innerText = temp;
+                    }
+                    $(obj[i]).attr('self-been-translated', 'true')
+                    // obj[i].innerText = temp;
+                }
+            }
+        }
+    }
+}
+
+function getElementTextWithoutChildren(element){
+    var text = '';
+    for (var i = 0; i < element.childNodes.length; i++) {
+        var node = element.childNodes[i];
+        if (node.nodeType === Node.TEXT_NODE) {// 排除子元素的文本
+            text += node.textContent;
+        }
+    }
+    return text;
+}
+
+function openReport(title, url, gridId, width, height) {
+    if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {//如果是移动端，就使用自适应大小弹窗
+        width = 'auto';
+        height = 'auto';
+    } else {//如果是PC端，根据用户设置的width和height显示。
+
+    }
+    $('#' + gridId + "Query").find(":input").each(function () {
+        url += ("&" + $(this).attr('name') + "=" + $(this).val());
+    });
+    if (url.indexOf('tedu:getUserId()') != -1 && userId != undefined) {
+        url = url.replace('tedu:getUserId()', userId);
+    }
+    top.layer.open({
+        type: 2,
+        area: [width, height],
+        title: title,
+        maxmin: true, //开启最大化最小化按钮
+        content: url,
+        btn: ['关闭'],
+        cancel: function (index) {
+        },
+        end: function () {
+        }
+    });
+}
+
+/* 
+    解决jQGrid拖动错位bug
+*/
+;(function (window) {
+    window.addEventListener('load', function () {
+        // 每一列的表头
+        let $titles = $('.ui-th-column')
+
+        function mouseupHandler() {
+            $('.ui-jqgrid-bdiv')[0].scrollBy({
+                top: 0,
+                left: 2,
+            })
+            $('.ui-jqgrid-bdiv')[0].scrollBy({
+                top: 0,
+                left: -2,
+            })
+            // 执行完后移除鼠标松开事件
+            document.removeEventListener('mouseup', mouseupHandler)
+        }
+
+        $titles.on('mousedown', function () {
+            document.addEventListener('mouseup', mouseupHandler)
+        })
+    })
+})(window)
+
+// 20230620 add
+function setScrollHeight() {
+    var divElement = document.querySelectorAll('.ui-jqgrid-bdiv')
+    var hasScrollbar, rect, posY, distanceToBottom, posX, distanceToRight;
+    divElement.forEach((ele, index) => {
+        hasScrollbar = ele.scrollWidth > ele.clientWidth;
+        if (hasScrollbar) {
+            ele.addEventListener('mousemove', (event) => {
+                // 获取鼠标相对于 div 元素底部边缘的位置
+                rect = ele.getBoundingClientRect();
+                posY = event.clientY - rect.top;
+                distanceToBottom = rect.height - posY;
+                posX = event.clientX - rect.left;
+                distanceToRight = rect.width - posX;
+
+                if (distanceToBottom <= 12 || distanceToRight <= 12) {
+                    ele.classList.add('scrollheight')
+
+                } else {
+                    ele.classList.remove('scrollheight')
+                }
+            })
+            ele.addEventListener('mouseout', () => {
+                ele.classList.remove('scrollheight')
+            })
+        }
+    })
+}
+
+// 20230620 add end
+window.addEventListener('load', function () {
+    let len = $('#xnxq,#xnxqh,#bkxnxq,#xnxq1,#xnxq2,#startXnxq,#endXnxq,#xn,#qsxnxq,#zzxnxq').find('option[selected]').length
+    if (len == 0) {
+        $('#xnxq,#xnxqh,#bkxnxq,#xnxq1,#xnxq2,#startXnxq,#endXnxq,#xn,#qsxnxq,#zzxnxq').css('cssText', 'color:#333 !important')
+    }
+    setScrollHeight()
+})
+$('#xnxq,#xnxqh,#bkxnxq,#xnxq1,#xnxq2,#startXnxq,#endXnxq,#xn,#qsxnxq,#zzxnxq').bind('change', function () {
+    let dqxnxq = $(this).find('option[selected]').text()
+    if ($(this).val() == dqxnxq) {
+        // $(this).css('color','#3CD0B9')
+        // $(this).css('color','#37bfaa')
+        $(this).css('color', '#00c297')
+        $(this).find('option').css('color', '#333')
+    } else {
+        $(this).css('color', '#333')
+    }
+})
+window.addEventListener('resize', function () {
+    setScrollHeight()
+})
+
+// 20230105 冻结列的公用方法 传两个参数，表格id和冻结列数
+function fixJqGridCol(id, n) {
+    // 非法参数
+    if (Number.isNaN(n) || n < 0) {
+        return
+    }
+    if (n === 0) {// 取消固定列
+        $('#gbox_' + id + 'Grid .ui-jqgrid-hdiv thead tr').each(function () {
+            $(this).find('th:visible').removeClass('fixedCol')
+        })
+        $('#gbox_' + id + 'Grid .ui-jqgrid-bdiv tbody tr.jqgrow').each(function () {
+            $(this).find('td:visible').removeClass('fixedCol')
+        })
+        return
+    }
+    handleFixCol()
+    function handleFixCol(){
+        // $('#gbox_' + id + 'Grid .ui-jqgrid-bdiv')[0].scrollBy({
+        //     top: 0,
+        //     left: 0,
+        // })
+        $('#gbox_' + id + 'Grid .ui-jqgrid-hdiv').scrollLeft(0)
+        $('#gbox_' + id + 'Grid .ui-jqgrid-bdiv').scrollLeft(0)
+        // 重置固定列相关样式
+        $('#gbox_' + id + 'Grid .ui-jqgrid-hdiv thead tr th:visible').css({
+            'left': '',
+            'position': '',
+            'z-index': ''
+        })
+        $('#gbox_' + id + 'Grid .ui-jqgrid-bdiv tbody tr.jqgrow td:visible').css({
+            'left': '',
+            'position': '',
+            'z-index': '',
+        })
+        
+        $('#gbox_' + id + 'Grid .ui-jqgrid-hdiv thead tr').each(function () {
+            // (:visible)筛选出可见的th
+            $(this).find('th:visible').removeClass('fixedCol')
+            $(this).find('th:visible').each(function (index) {
+                // 已经达到前n列
+                if (index >= n) {
+                    return false
+                }
+                const $thDom = $(this)
+                $thDom.addClass('fixedCol')
+                // 设置其css的left
+                $thDom.css('left', $thDom.position().left + 'px')
+            })
+        })
+        $('#gbox_' + id + 'Grid .ui-jqgrid-bdiv tbody tr.jqgrow').each(function () {
+            $(this).find('td:visible').removeClass('fixedCol')
+            $(this).find('td:visible').each(function (index) {
+                // 已经达到前n列
+                if (index >= n) {
+                    return false
+                }
+                const $thDom = $(this)
+                $thDom.addClass('fixedCol')
+                // 设置其css的left
+                $thDom.css('left', $thDom.position().left + 'px')
+            })
+        })
+    }
+
+    let timer = null
+    window.addEventListener('resize',function(){
+        timer && clearTimeout(timer)
+        timer = setTimeout(()=>{
+            handleFixCol()
+        },500)
+    })
+    // jqGridResizeStop
+    $(`#${id}Grid`).bind("jqGridResizeStop", function () {
+        handleFixCol()
+    });
+}
+
+// 添加冻结列的结构
+function addFixedStruct(id) {
+    $('#pager_' + id + '_right').prepend(`
+        <div class="fixed-col-setting-wrap">
+            <div class="fix-tips">
+                <div class="icon"></div>
+                <div class="tips">冻结列设置</div>
+            </div>
+            <div class="fix-popover" style="display: none;">
+                <div class="fix-before-tips">冻结前几列</div>
+                <div class="fix-list">
+                    <div class="fix-item" data-fixedCols="1">1</div>
+                    <div class="fix-item" data-fixedCols="2">2</div>
+                    <div class="fix-item" data-fixedCols="3">3</div>
+                    <div class="fix-item" data-fixedCols="4">4</div>
+                    <div class="fix-item" data-fixedCols="5">5</div>
+                </div>
+            </div>
+        </div>
+    `)
+    var wrapElement = $("<div>").addClass("paging-info-wrap");
+    $('#pager_' + id + '_right').find('.fixed-col-setting-wrap').appendTo(wrapElement)
+    $('#pager_' + id + '_right').find('.ui-paging-info').appendTo(wrapElement)
+    $('#pager_' + id + '_right').empty()
+    $('#pager_' + id + '_right').append(wrapElement)
+
+
+    $('.fixed-col-setting-wrap').on('click', function (e) {
+        e.stopPropagation()
+        $(this).find('.fix-popover').show()
+    })
+    $('.fixed-col-setting-wrap .fix-item').on('click', function (e) {
+        e.stopPropagation()
+        if ($(this).hasClass('active')) {
+            localStorage.removeItem(id + '_fixedCols')
+            $(this).removeClass('active')
+            fixJqGridCol(id, 0)// 去除固定
+        } else {
+            $('.fixed-col-setting-wrap .fix-item').removeClass('active')
+            $(this).addClass('active')
+            let val = $(this).attr('data-fixedCols')
+            // 存入localStorage
+            localStorage.setItem(id + "_fixedCols", val)
+            fixJqGridCol(id, val)
+        }
+    })
+    window.addEventListener('click', function () {
+        if ($('.fixed-col-setting-wrap .fix-popover:visible').length > 0) {
+            $('.fixed-col-setting-wrap .fix-popover').hide()
+        }
+    })
+}
+
+/* 传入一个需要固定列的JqGrid表格的id, 比如学生基本信息页面传入 'xsjbxx'  */
+function createFixColByJqGridId(id) {
+    if (id) {
+        function computedWidth(){
+            let curJqGridObj = $(`#${id}Grid`)
+            // let isMultiselect = curJqGridObj.jqGrid("getGridParam", "multiselect");
+            // $(`#pager_${id}_left`).css('width','21%')
+            // $(`#pager_${id}_right`).css('width','30%')
+            // if(isMultiselect){// 有已选x条
+            //     if($(`#pager_${id}`).width() > 670){
+            //         $(`#pager_${id}_right`).find('.fixed-col-setting-wrap').show()
+            //     }else{
+            //         $(`#pager_${id}_right`).find('.fixed-col-setting-wrap').hide()
+            //     }
+            // }else{
+            //     if($(`#pager_${id}`).width() > 600){
+            //         $(`#pager_${id}_right`).find('.fixed-col-setting-wrap').show()
+            //     }else{
+            //         $(`#pager_${id}_right`).find('.fixed-col-setting-wrap').hide()
+            //     }
+            // }
+            if($(`#pager_${id}`).width() > 830){
+                $(`#pager_${id}_right`).find('.fixed-col-setting-wrap').show()
+                $(`#pager_${id}_right`).css('width','auto')
+            }else{
+                $(`#pager_${id}_right`).find('.fixed-col-setting-wrap').hide()
+                $(`#pager_${id}_right`).css('width','200px')
+            }
+        }
+        let timer = null
+        window.addEventListener('resize',function(){
+            timer && clearTimeout(timer)
+            timer = setTimeout(()=>{
+                computedWidth()
+            },500)
+        })
+        $(`#${id}Grid`).bind("jqGridLoadComplete", function () {
+            if ($(`#pager_${id}_right .fixed-col-setting-wrap`).length <= 0) {
+                addFixedStruct(id) //表格id
+            }
+            computedWidth()
+            let curSaveFixedCols = parseInt(localStorage.getItem(`${id}_fixedCols`))
+            if (curSaveFixedCols && curSaveFixedCols > 0) {
+                $('.fixed-col-setting-wrap .fix-item').eq(curSaveFixedCols - 1).addClass('active')
+                // fixJqGridCol(parseInt(curSaveFixedCols))
+                fixJqGridCol(id, parseInt(curSaveFixedCols)) //表格id  冻结列数
+            }
+        });
+    }
+}
+
+// jqGrid拖动列调整顺序后，请求保存
+function dragColSave(id) {
+    let gridId = id + "Grid"
+    let requestFlag = false
+    $("#" + gridId).bind("jqGridRemapColumns", function (permutation, updateCells, keepHeader, updateData, setting) {
+        if (setting !== 'setting' && !requestFlag) {// 不是通过设置按钮引起的列顺序变化，说明是通过拖拽触发的
+            requestFlag = true
+            let colModel = $("#" + gridId).jqGrid('getGridParam', 'colModel')
+            if (Array.isArray(colModel)) {
+                let fieldArr = []
+                for (let i = 0; i < colModel.length; i++) {
+                    const item = colModel[i];
+                    // 挑选出正常的列字段，并且是显示的
+                    if (item.name && item.label && !item.hidden) {
+                        fieldArr.push(item.name)
+                    }
+                }
+                var gridUrl = $("#" + gridId).jqGrid("getGridParam", "url") || 'defaultUrl';
+                if (gridUrl.indexOf("?") > -1) {
+                    gridUrl = gridUrl.substring(0, gridUrl.indexOf("?"));
+                }
+                // console.log(gridUrl,fieldArr.join(','),'接口请求');
+                let fieldsStr = fieldArr.join(',')
+                var adminPath = $("#adminPath").val();
+                if (adminPath == undefined || adminPath == "") {
+                    return false;
+                }
+                let loadIndex = layer.load();
+                $.ajax({
+                    type: "post",
+                    dataType: "json",
+                    url: adminPath + "/system/gridfield/insertOrUpdateColumns",
+                    data: {
+                        gridId: gridId,
+                        gridurl: gridUrl,
+                        fields: fieldsStr,
+                    },
+                    async: false,
+                    success: function (data) {
+                        requestFlag = false
+                        $("#" + gridId).trigger("reloadGrid");
+                        layer.close(loadIndex);
+                    },
+                    error: function (data) {
+                        requestFlag = false
+                        layer.close(loadIndex);
+                    }
+                });
+
+            }
+
+        }
+    })
+}
+
+// jqGrid添加左下角已选条数统计
+function addJqGridSelCount(id) {
+    let firstInit = true
+    $(`#${id}Grid`).bind("jqGridGridComplete", function () {
+        if (firstInit) {
+            firstInit = false
+            $(`#pager_${id}_left`).append(`
+                <div class="selected_count">
+                    已选<span class="count_num">0</span>条
+                </div>
+            `)
+        }
+    });
+    // 添加两个钩子函数
+    $(`#${id}Grid`).bind("jqGridSelectRow", function (args) {
+        let selectedRows = $(`#${id}Grid`).jqGrid('getGridParam', 'selarrrow');
+        let selLength = selectedRows.length
+        let $selCount = $(`#pager_${id}_left`).find('.selected_count')
+        // if($selCount.length > 0){
+        //     $selCount.find('span').text(selLength)
+        // }else{
+        //     $(`#pager_${id}_left`).append(`
+        //     <div class="selected_count">
+        //     已选<span class="count_num">${selLength}</span>条
+        //     </div>
+        //     `)
+        // }
+        $selCount.find('span.count_num').text(selLength)
+    });
+    $(`#${id}Grid`).bind("jqGridSelectAll", function (args) {
+        var selectedRows = $(`#${id}Grid`).jqGrid('getGridParam', 'selarrrow');
+        let selLength = selectedRows.length
+        let $selCount = $(`#pager_${id}_left`).find('.selected_count')
+        // if($selCount.length > 0){
+        //     $selCount.find('span').text(selLength)
+        // }else{
+        //     $(`#pager_${id}_left`).append(`
+        //     <div class="selected_count">
+        //     已选<span class="count_num">${selLength}</span>条
+        //     </div>
+        //     `)
+        // }
+        $selCount.find('span.count_num').text(selLength)
+    });
+}
+
+// jqGrid按下shift多选
+function pressShiftMultiSel(jqGridId) {
+    let firstInit = true
+    $(`#${jqGridId}Grid`).bind("jqGridGridComplete", function () {
+        if (firstInit) {
+            firstInit = false
+            $("#gbox_" + jqGridId + "Grid").on("click", ".jqgrow", function (event) {
+                // 如果此时按下了shift键
+                if (event.shiftKey) {
+                    let preSelectedTrs = $(this).prevAll('.jqgrow.success')
+                    if (preSelectedTrs.length > 0) {
+                        let closestItem = preSelectedTrs.eq(0) // 最靠近那一个
+                        let $neetSelTrs = $(this).prevAll('.jqgrow').addBack()
+                            .slice(closestItem.index(), $(this).index() - 1).not('.success')
+                        $neetSelTrs.click()
+                    } else {
+                        let nextSelectedTrs = $(this).nextAll('.jqgrow.success')
+                        if (nextSelectedTrs.length > 0) {
+                            let closestItem = nextSelectedTrs.eq(0) // 最靠近那一个
+                            let $neetSelTrs = $(this).siblings('.jqgrow').addBack()
+                                .slice($(this).index(), closestItem.index()).not('.success')
+                            $neetSelTrs.click()
+                        }
+                    }
+                }
+            });
+        }
+    });
+}
+
+// jqGrid在使用追加next按钮，添加数据时，给追加出来的第一条数据添加高亮，表示分割
+function addNextRowHighlight(jqGridId) {
+    $(`#${jqGridId}Grid`).bind("jqGridLoadComplete", function () {
+        // $(`#pager_${jqGridId}_center .add-next`).css('display','table-cell')
+        var pagesize = $(`#${jqGridId}Grid`).jqGrid('getGridParam', 'rowNum');
+        if(typeof pagesize =='number' && pagesize>0){ //rowNum有时会传-1或其他不规范的值
+            var trs = $(`#${jqGridId}Grid`).find('tr.jqgrow[id]')
+            $(trs).each(function () {
+                if ($(this).hasClass('highlight')) {
+                    $(this).removeClass('highlight')
+                }
+            })
+            if (trs.length <= pagesize) {
+                return
+            } else {
+                var pagenum = Math.ceil((trs.length) / pagesize)
+                var lineheigthtr = (pagenum - 1) * pagesize
+                $(trs).eq(lineheigthtr).addClass('highlight')
+            }
+            let top1 = $(trs).eq(lineheigthtr).position().top
+            let top2 = $(`#gbox_${jqGridId}Grid .ui-jqgrid-bdiv`).position().top
+            let top = top1 - top2
+            $(`#gbox_${jqGridId}Grid .ui-jqgrid-bdiv`).stop().animate({scrollTop: top}, 500)
+        }else{
+            return;
+        }
+    })
+}
+function addNextByJqGridId(grid){ //grid是byxtsz_20211011ljk001Grid这种形式的
+    if(grid){
+        var $addnextBtn=$('#gbox_'+grid).find('.ui-jqgrid-pager .add-next')
+        var gboxGridWidth=$('#gbox_'+grid).width()
+        function addNextBtnShowOrHideByJqgridWidth(){ //通过表格宽度控制 ‘追加下一页’显示隐藏
+            gboxGridWidth=$('#gbox_'+grid).width()
+            var flag=true;
+            if(gboxGridWidth<=830){
+                $addnextBtn.css('display','none')
+                $addnextBtn.parents('td[id$="_center"]').css('width','350px')
+                flag=false
+            }else{
+                $addnextBtn.css('display','table-cell')
+                $addnextBtn.parents('td[id$="_center"]').css('width','450px')
+                flag=true
+            }
+            return flag;
+        }
+        function addNextBtnShowOrHideByRownum(jqGridId,flag1){ //通过表格rownum每页条数控制 ‘追加下一页’显示隐藏
+            if(flag1){ //已经判断宽度>830 显示状态
+                var pagesize = $(`#${jqGridId}Grid`).jqGrid('getGridParam', 'rowNum');
+                if(!(typeof pagesize =='number' && pagesize>0)){
+                    $addnextBtn.css('display','none')
+                    $addnextBtn.parents('td[id$="_center"]').css('width','350px')
+                }
+            }
+        }
+        function addNextBtnClass(jqGridId){
+            var $pageTableCenter=$(`#pager_${jqGridId}_center`)
+            if($pageTableCenter.length==0){ //pageable="false" 不执行下面代码
+                return
+            }
+            $(`#${jqGridId}Grid`).bind("jqGridLoadComplete", function () {
+                var total=$pageTableCenter.find(`#sp_1_pager_${jqGridId}`).text() || '0'; //共多少页
+                var pagenum=$pageTableCenter.find('.ui-pg-input').val() //当前第几页
+                // 超过999页时total会带逗号，需要去掉，否则追加下一页会被置灰
+                if (total.indexOf(',') > -1) {
+                    total = total.replaceAll(',', '');
+                }
+                if(parseInt(total)>1 && pagenum!=total){
+                    $addnextBtn.removeClass('ui-disabled')
+                }else{
+                    $addnextBtn.addClass('ui-disabled')
+                }
+            })
+        }
+        var flag1=addNextBtnShowOrHideByJqgridWidth()
+        addNextBtnShowOrHideByRownum(grid.slice(0, -4),flag1)
+        addNextBtnClass(grid.slice(0, -4))
+        var addnextFunction=function (){
+            addNextRowHighlight(grid.slice(0, -4)) //全局添加追加下一页 第一条数据高亮
+        };
+        $addnextBtn.off('click',addnextFunction)
+        $addnextBtn.on('click',addnextFunction)
+
+        let addnexttimer = null
+        window.addEventListener('resize',function(){
+            addnexttimer && clearTimeout(addnexttimer)
+            addnexttimer = setTimeout(()=>{
+                addNextBtnShowOrHideByJqgridWidth()
+            },500)
+        })
+
+    }
+}
+
+// jqGrid添加分页全选的功能
+function addJqGridSelectAll(jqGridId){
+    let curJqGridObj = $(`#${jqGridId}Grid`)
+    // $("#" + gridId).jqGrid('getGridParam', 'sortname');
+    let firstInit = true
+    $(`#${jqGridId}Grid`).bind("jqGridGridComplete", function () {
+        // 获取这个jqGrid是否是分页的且可多选的
+        let isPagingEnabled = curJqGridObj.jqGrid("getGridParam", "pager");
+        let isMultiselect = curJqGridObj.jqGrid("getGridParam", "multiselect");
+        let allcheckbox = $(`#selectAll_${jqGridId}`);
+        if (isPagingEnabled && isMultiselect && firstInit && allcheckbox.length ==0) {
+            // 全局保存 全选状态值、未选数组
+            window[`selectAll_${jqGridId}`] = false
+            window[`noSelList_${jqGridId}`] = []
+            firstInit = false
+            $(`#pager_${jqGridId}_left > .selected_count`).prepend(`
+                <label class="selected_all_pager">
+                    <input type="checkbox" id="selectAll_${jqGridId}" class="cbox checkbox"> 
+                    <div>选中所有数据</div>
+                </label>
+            `)
+            $(`#pager_${jqGridId}_left > .selected_count > .count_num`).hide()
+            $(`#pager_${jqGridId}_left > .selected_count > .all_count_num`).removeClass('hide')
+
+            // 全选的checkbox的change事件
+            let selectAllCheckBox = $(`#selectAll_${jqGridId}`)
+            selectAllCheckBox.on('change', function () {
+                let isChecked = $(this).prop('checked')
+                // 全局保存 全选状态值、未选列表
+                window[`selectAll_${jqGridId}`] = isChecked
+                const currentPageIds = curJqGridObj.getDataIDs();
+                // 已选中的
+                const selectedRowIds = curJqGridObj.getGridParam("selarrrow");
+                if(isChecked){
+                    for (let i = 0; i < currentPageIds.length; i++) {
+                        const rowId = currentPageIds[i];
+                        // const rowData = curJqGridObj.getRowData(rowId);
+                        const isSelected = selectedRowIds.includes(rowId);
+                        if(!isSelected){
+                            // 这个方法并不能指定选成true或false只能取反，这里参数false表示不要触发jqGridSelectRow事件
+                            curJqGridObj.jqGrid("setSelection", rowId, true);
+                        }
+                    }
+                } else {
+                    for (let i = 0; i < currentPageIds.length; i++) {
+                        const rowId = currentPageIds[i];
+                        const isSelected = selectedRowIds.includes(rowId);
+                        if (isSelected) {
+                            curJqGridObj.jqGrid("setSelection", rowId, true);
+                        }
+                    }
+                    window.SelectList = []
+                }
+                if (window[`selectAll_${jqGridId}`]) {
+                    let totalRecords = curJqGridObj.jqGrid("getGridParam", "records");
+                    let count = totalRecords - window[`noSelList_${jqGridId}`].length
+                    $('.selected_count>.all_count_num ').text(count)
+                } else {
+                    setTimeout(() => {
+                        $('.selected_count>.all_count_num ').text(window.SelectList.length)
+                    })
+                }
+                window[`noSelList_${jqGridId}`] = []
+            })
+
+            // 监听某行选择时，选中或不选中都触发
+            curJqGridObj.bind("jqGridSelectRow", function (event,rowid,status) {
+                let totalRecords = curJqGridObj.jqGrid("getGridParam", "records");
+                if(status){// 选中
+                    let arr = window[`noSelList_${jqGridId}`]
+                    window[`noSelList_${jqGridId}`] = arr.filter(item => item !== rowid);
+                    // 未选列表长度为0，说明全部已选
+                    if(window[`selectAll_${jqGridId}`] && window[`noSelList_${jqGridId}`].length === 0){
+                        window[`selectAll_${jqGridId}`] = true
+                        selectAllCheckBox.prop('checked',true)
+                    }
+                    // 如果没有选中所有，则判断每次单个选中的数量等于总数吗，如果也标识为选中所有了
+                    if(!window[`selectAll_${jqGridId}`]){
+                        setTimeout(()=>{
+                            if(window.SelectList.length === totalRecords){
+                                window[`selectAll_${jqGridId}`] = true
+                                selectAllCheckBox.prop('checked',true)
+                            }
+                        })
+                    }
+                }else{// 取消选中
+                    window[`noSelList_${jqGridId}`].push(rowid)
+                    selectAllCheckBox.prop('checked',false)
+                    // 未选列表长度为所有数量，说明全部取消
+                    if(window[`noSelList_${jqGridId}`].length === totalRecords){
+                        window[`selectAll_${jqGridId}`] = false
+                        selectAllCheckBox.prop('checked',false)
+                    }
+                }
+                // 计算选中条数
+                if(window[`selectAll_${jqGridId}`]){
+                    let count = totalRecords - window[`noSelList_${jqGridId}`].length
+                    $('.selected_count>.all_count_num ').text(count)
+                }else{
+                    setTimeout(()=>{
+                        $('.selected_count>.all_count_num ').text(window.SelectList.length)
+                    })
+                }
+            });
+            // 监听当页全选或取消全选
+            curJqGridObj.bind("jqGridSelectAll", function (event,rowids,status) {
+                let totalRecords = curJqGridObj.jqGrid("getGridParam", "records");
+                if(status){// 当页选中
+                    let arr = window[`noSelList_${jqGridId}`]
+                    window[`noSelList_${jqGridId}`] = arr.filter(item => !rowids.includes(item));
+                    if(window[`selectAll_${jqGridId}`] && window[`noSelList_${jqGridId}`].length === 0){
+                        window[`selectAll_${jqGridId}`] = true
+                        selectAllCheckBox.prop('checked',true)
+                    } 
+                    // 如果没有选中所有，则判断每次单个选中的数量等于总数吗，如果也标识为选中所有了
+                    if(!window[`selectAll_${jqGridId}`]){
+                        setTimeout(()=>{
+                            if(window.SelectList.length === totalRecords){
+                                window[`selectAll_${jqGridId}`] = true
+                                selectAllCheckBox.prop('checked',true)
+                            }
+                        })
+                    }
+                }else{// 当页取消选中
+                    let arr = window[`noSelList_${jqGridId}`]
+                    selectAllCheckBox.prop('checked',false)
+                    // 连接两个数组并去重复
+                    window[`noSelList_${jqGridId}`] = [...new Set(arr.concat(rowids))];
+                    if(window[`noSelList_${jqGridId}`].length === totalRecords){
+                        window[`selectAll_${jqGridId}`] = false
+                        selectAllCheckBox.prop('checked',false)
+                    }
+                }
+                // 计算选中条数
+                if(window[`selectAll_${jqGridId}`]){
+                    let count = totalRecords - window[`noSelList_${jqGridId}`].length
+                    $('.selected_count>.all_count_num ').text(count)
+                }else{
+                    setTimeout(()=>{
+                        $('.selected_count>.all_count_num ').text(window.SelectList.length)
+                    })
+                }
+            });
+        }
+    });
+
+    $(`#${jqGridId}Grid`).bind("jqGridLoadComplete", function (e,data) {
+        let isPagingEnabled = curJqGridObj.jqGrid("getGridParam", "pager");
+        let isMultiselect = curJqGridObj.jqGrid("getGridParam", "multiselect");
+        if (!isPagingEnabled || !isMultiselect) {
+            return
+        }
+        if (typeof data != 'undefined' && typeof data.results != 'undefined' && data.results.length > 0) {
+            if (window[`selectAll_${jqGridId}`]) {
+                const currentPageIds = curJqGridObj.getDataIDs();
+                const selectedRowIds = curJqGridObj.getGridParam("selarrrow");
+                for (let i = 0; i < currentPageIds.length; i++) {
+                    const rowId = currentPageIds[i];
+                    const isSelected = selectedRowIds.includes(rowId);
+                    let noSelList = window[`noSelList_${jqGridId}`]
+                    // 每次jqGridLoadComplete加载，判断是否全选了，如果全选了，则将加载的行(且不在未选列表中)都手动选中
+                    if (!isSelected && (noSelList && !noSelList.includes(rowId))) {
+                        // 这个方法并不能指定选成true或false只能取反，这里参数false表示不要触发jqGridSelectRow事件
+                        curJqGridObj.jqGrid("setSelection", rowId, true);
+                    }
+                }
+            }
+        }
+    })
+    
+
+}
+
+function viewImage(_this) {
+    let url = $(_this).attr("src");
+    if (!isEmpty(url)) {
+        let items = [];
+        items.push(url);
+        createImgViewer(items, 0);
+    }
+}
+
+//获取自定义参数
+function getSystemZdycs(path, keyword, grid) {
+    let ret = "";
+    let data = {path: path, keyword: keyword, grid: grid};
+    if (isEmpty(path) || isEmpty(keyword)) {
+        return ret;
+    }
+    $.ajax({
+        type: "post",
+        url: $("#adminPath").val() + "/system/systemyhzdsz/getSdznpkSzb",
+        async: false,
+        data: data,
+        success: function (res) {
+            if (res.ret == 0) {
+                ret = res.data.paramvalue
+            }
+        }
+    });
+    return ret;
+}
+
+//修改自定义参数
+function saveSystemZdycs(path, keyword, grid, paramvalue) {
+    let data = {path: path, keyword: keyword, grid: grid, paramvalue: paramvalue};
+    $.ajax({
+        type: "POST",
+        url: $("#adminPath").val() + "/system/systemyhzdsz/saveSdznpkSzb",
+        data: data,
+        success: function (res) {
+
+        },
+    });
+}
+
+function jqGridFirstAddPostData(gridId){
+    var queryParams = {};
+    var queryFields = $('#queryFields').val();
+    queryParams['queryFields'] = queryFields;
+    //普通的查询
+    $('#' + gridId + "Query").find(":input").each(function () {
+        if (!isEmpty($(this).attr('name'))) {
+            var val = $(this).val();
+            if (val != null && val != '') {
+                val = val.toString();
+            }
+            if (val != null) {
+                if (val[0] < 1) {
+                    val = val.toString();
+                }
+            }
+            if (queryParams[$(this).attr('name')]) {
+                val = queryParams[$(this).attr('name')] + "," + val;
+            }
+            queryParams[$(this).attr('name')] = val;
+        }
+    });
+
+    // 普通的查询
+    $('#' + gridId + "Query").find(":input").each(function () {
+        var condition = $(this).attr('condition');
+        if (!condition) {
+            condition = "";
+        }
+        if (!isEmpty($(this).attr('name'))) {
+            var key = "query." + $(this).attr('name') + "||" + condition;
+            queryParams[key] = queryParams[$(this).attr('name')];
+        }
+    });
+    //刷新
+    //传入查询条件参数
+    $("#" + gridId).jqGrid('setGridParam', {
+        datatype: 'json',
+        postData: queryParams, //发送数据
+        page: 1
+    })
+}
+function allJqgrid() {
+    var grids = [];
+    $('.ui-jqgrid').each((index, ele) => {
+        // var grid = $(ele).attr('id').split('_')[1]
+        // 例如gbox_byxtsz_20211011ljk001Grid，用上面这个截取会出问题
+        var grid = $(ele).attr('id').slice(5)
+        grids.push(grid)
+        var numberTh = $(ele).find(".ui-jqgrid-htable thead tr th[id$='_cb']")
+        if ($(numberTh).length != 0 && !$(numberTh).is(':hidden')) {
+            pressShiftMultiSel(grid.substring(0, grid.length - 4)) //为所有jqgrid表格加shift多选功能
+            // addJqGridSelCount(grid.substring(0, grid.length - 4)) //为所有jqgrid表格加 已选条数功能
+        }
+        // 冻结列全局添加
+        createFixColByJqGridId(grid.slice(0, -4))
+        addNextByJqGridId(grid) //全局为追加下一页加高亮功能 并 根据表格宽度和rownum隐藏或显示追加下一页按钮
+        // 拖拽列顺序永久保存
+        dragColSave(grid.slice(0, -4))
+        desensitization(grid.slice(0, -4)) //全局给所有jqgrid表格 身份证 联系电话 信息加小眼睛功能
+        $(ele).find('.ui-jqgrid-htable thead tr').each((index, eleth) => {
+            // $(eleth).find('th:visible').eq(0).addClass('firstThOrTd') //给thead所有没有被隐藏的第一个th加类名
+            $(eleth).find('th').each((index1, ele1) => {
+                var isDisplayNone = $(ele1).css('display') === 'none'
+                if (!isDisplayNone) {
+                    $(ele1).addClass('firstThOrTd');
+                    return false;
+                }
+            })
+        })
+    })
+    grids.forEach(item => {
+        jqGridFirstAddPostData(item)
+        top.window[`${item}_exportParam`] = null
+        let $jqGridBtns = $('#' + item).parents('.jqGrid_wrapper').prev('.row').find('button.btn')
+        let workExportBtnArr = []
+        $jqGridBtns.each(function(){
+            let btnContent = $(this).text()
+            if(
+                item !== 'zxjhGridIdGrid' &&
+                ((btnContent.includes('导出') && !btnContent.includes('导出记录')) ||
+                (btnContent.includes('打印') && !btnContent.includes('打印在读证明')) ||
+                $(this).hasClass('workCenter-export-btn'))
+            ){
+                workExportBtnArr.push(this)
+            }
+        })
+        $('#' + item).bind('jqGridLoadComplete', function (e, data) {
+            if(Array.isArray(data)){
+                if(data.length > 0){
+                    // 解除置灰
+                    workExportBtnArr.forEach(item =>{
+                        $(item).removeClass('unable-export-btn')
+                    })
+                }else{
+                    // 添加置灰
+                    workExportBtnArr.forEach(item =>{
+                        $(item).addClass('unable-export-btn')
+                    })
+                }
+            }else{
+                if(data && data.results && data.results.length > 0){
+                    // 解除置灰
+                    workExportBtnArr.forEach(item =>{
+                        $(item).removeClass('unable-export-btn')
+                    })
+                }else{
+                    // 添加置灰
+                    workExportBtnArr.forEach(item =>{
+                        $(item).addClass('unable-export-btn')
+                    })
+                }
+            }
+            $('#gbox_' + item).find('.ui-jqgrid-btable tbody tr').each((index, eletd) => {
+                // $(eletd).find('td:visible').eq(0).addClass('firstThOrTd') //给tbody所有没有被隐藏的第一个td加类名
+                $(eletd).find('td').each((index1, ele1) => {
+                    var isDisplayNone = $(ele1).css('display') === 'none'
+                    if (!isDisplayNone) {
+                        $(ele1).addClass('firstThOrTd')
+                        return false;
+                    }
+                })
+            })
+            var bdiv = $('#gbox_' + item).find('.ui-jqgrid-bdiv')
+            var btable = $('#gbox_' + item).find('.ui-jqgrid-bdiv .ui-jqgrid-btable')
+
+            if ($(btable)[0].clientHeight >= $(bdiv)[0].clientHeight) { //判断表格内容高度是否超出表格高度
+                $(bdiv).addClass('lastTrStyle') //超出 给最后一个tr下边框置为透明
+            } else {
+                $(bdiv).removeClass('lastTrStyle')
+            }
+        })
+        let curSaveRowNum=parseInt(localStorage.getItem(item + "_rowNum"))
+        if(curSaveRowNum){
+            var item1=item.slice(0,-4)
+            $('#'+item).parents('#gbox_'+item).find('#pager_'+item1).find('.ui-pg-selbox').val(curSaveRowNum)
+        }
+    })
+}
+
+
+// 通过这个方法导出，会有动画效果，并且会讲导出任务加到下载中心列表中
+function workCenterExport(url, param, event, gridId) {
+    // top.layer.load(2);
+    // $.ajax({
+    //     url: url,
+    //     data: param,
+    //     type: "post",
+    //     success: function (res) {
+    //         top.layer.close(top.layer.load(2));
+    //         if(top.window.hasWorkCenter){
+    //             if (res.ret === 0) {
+    //                 //新任务 动画
+    //                 exportAnimation(event)
+    //                 workCenterGlobalMsg('您有一个文件已开始导出', '', '/workcenter/homepage/list?center=download')
+    //             } else if (res.ret === 1) {
+    //                 // 重复任务正在进行中
+    //                 workCenterGlobalMsg('任务导出中', '', '/workcenter/homepage/list?center=download')
+    //             } else if (res.ret === 2) {
+    //                 // 这个任务已经完成
+    //                 workCenterGlobalMsg('导出已完成', '', '/workcenter/homepage/list?center=download')
+    //             } else {
+    //                 swal("提示", res.msg || "操作失败,请重试", "error");
+    //             }
+    //         }else{
+    //             if (res.ret === 0) {
+    //                 workCenterGlobalMsg('您有一个文件已开始导出，请在导出记录中查看')
+    //             } else if (res.ret === 1) {
+    //                 // 重复任务正在进行中
+    //                 workCenterGlobalMsg('任务导出中，请在导出记录中查看')
+    //             } else if (res.ret === 2) {
+    //                 // 这个任务已经完成
+    //                 workCenterGlobalMsg('导出已完成，请在导出记录中查看')
+    //             } else {
+    //                 swal("提示", res.msg || "操作失败,请重试", "error");
+    //             }
+    //         }
+    //     },
+    //     error(err) {
+    //         top.layer.close(top.layer.load(2));
+    //         swal("提示", "操作失败,请重试", "error");
+    //     }
+    // });
+    let searchPostData = $(`#${gridId}`).jqGrid("getGridParam", "postData");
+
+    let positionObj = getDomPositionInTopWindow(event.target)
+    top.window.postMessage({
+        type: 'workCenterExport',
+        url: url,
+        queryParams: param,
+        positionObj: positionObj,
+        gridId: gridId,
+        searchPostData: searchPostData,
+    }, '*');
+}
+
+// 点击导出时，小红点动画效果
+function exportAnimation(event) {
+    if (event) {
+        // 先对于屏幕的位置，这个位置就不用考虑iframe影响了
+        let {x, y} = getDomPositionInTopWindow(event.target)
+        console.log(event.target, x, y);
+        let topDocument = top.window.document
+        let topBody = topDocument.body || topDocument.getElementsByTagName('body')[0];
+        let $workCenterInfo = $(topBody).find('.workCenterInfo')
+        if ($workCenterInfo.length > 0) {
+            // 调用right-info.jsp中全局定义的handleWorkCenterMsg
+            console.log(top.window.handleWorkCenterMsg);
+            top.window.handleWorkCenterMsg && top.window.handleWorkCenterMsg()
+            let {left: offsetLeft, top: offsetTop} = $workCenterInfo.offset()
+            console.log($workCenterInfo);
+
+            let $movingElement = $(`<div class="work-ani-pointer"></div>`)
+            $movingElement.css({
+                position: 'fixed',
+                top: y + 'px',
+                left: x + 'px',
+                // opacity: 1,
+            })
+            $(topBody).append($movingElement)
+            $movingElement.animate(
+                {
+                    top: offsetTop + 30,
+                    left: offsetLeft,
+                    // opacity: 0
+                },
+                2000,
+                'swing',
+                function () {
+                    // viewMsgNumAdd()
+                    $workCenterInfo.find('.work-center-icon .icon').animate({
+                        'zoom': '1.5'
+                    }, 500, function () {
+                        $workCenterInfo.find('.work-center-icon .icon').animate({
+                            'zoom': '1'
+                        }, 500)
+                    })
+                    $movingElement.remove();
+                }
+            )
+        }
+    }
+}
+
+// 传入一个元素，获取该元素相对于最上层页面的位置
+function getDomPositionInTopWindow(domEle) {
+    var left = 0;
+    var top = 0;
+    let curWindow = window
+    let curBody = curWindow.document.body
+    let flag = false
+    while (domEle) {
+        let {x, y} = domEle.getBoundingClientRect();
+        left += x
+        top += y
+        let curIframe = curWindow.frameElement
+        if (curIframe) {
+            let {x: iframeX, y: iframeY} = curIframe.getBoundingClientRect();
+            left += iframeX
+            top += iframeY
+        }
+        curWindow = curWindow.parent
+        curBody = curWindow.document.body
+        if (curBody === window.top.document.body) {
+            break;
+            // if(flag){
+            // }else{
+            //     flag = true
+            // }
+        }
+    }
+
+    return {x: left, y: top};
+}
+
+function viewMsgNumAdd() {
+    let topDocument = top.window.document
+    let topBody = topDocument.body || topDocument.getElementsByTagName('body')[0];
+    let $workCenterInfo = $(topBody).find('.workCenterInfo')
+    if ($workCenterInfo.length > 0) {
+        let downNum = $workCenterInfo.find('.work-center-wrap .download .tips-num').attr('data-num')
+        let totalNum = $workCenterInfo.find('.work-center-icon .tips-num').attr('data-num')
+        console.log(downNum, totalNum);
+        downNum++
+        totalNum++
+        $workCenterInfo.find('.work-center-wrap .download .tips-num-wrap').show()
+        $workCenterInfo.find('.work-center-icon .tips-num-wrap').show()
+        $workCenterInfo.find('.work-center-wrap .download .tips-num').attr('data-num', downNum)
+        $workCenterInfo.find('.work-center-icon .tips-num').attr('data-num', totalNum)
+        if (downNum > 99) {
+            $workCenterInfo.find('.work-center-wrap .download .tips-num').text('99+')
+        } else {
+            $workCenterInfo.find('.work-center-wrap .download .tips-num').text(downNum)
+        }
+        if (totalNum > 99) {
+            $workCenterInfo.find('.work-center-icon .tips-num').text('99+')
+        } else {
+            $workCenterInfo.find('.work-center-icon .tips-num').text(totalNum)
+        }
+    }
+}
+// 生成消息体
+function workCenterGlobalMsg(msgText, iconClass = '', goUrl) {
+    let topDocument = top.window.document
+    let topBody = topDocument.body || topDocument.getElementsByTagName('body')[0];
+    // 请确保这个adminPath有正确值
+    // let adminPath = $('#adminPath').val()
+    let adminPath = $(topBody).find('#adminPath').val()
+    let linkHtml = ``
+    if(goUrl){
+        let href = adminPath + goUrl
+        linkHtml = `<a class="view-detail" target="_blank" href="${href}">点击前去查看</a>`
+    }
+    // success warning
+    let $msgDom = $(`
+        <div class="global-tip-msg ${iconClass}">
+            <div class="tips-icon"></div>
+            <div class="tips-text">${msgText}，</div>
+            ${linkHtml}
+        </div>
+    `)
+    let globalMsgLength = $(top.document.body).children('.global-tip-msg').length
+    console.log(globalMsgLength);
+    $msgDom.css({
+        top: 80 + (globalMsgLength) * (48 + 10) + 'px',
+    })
+    $(top.document.body).append($msgDom)
+    
+    let curTimer = top.window.setTimeout(() => {
+        console.log($msgDom,'三秒删除!')
+        $msgDom.remove()
+        // 每当有一个删除时，将其余消息位置都网上提一“格”
+        $(top.document.body).children('.global-tip-msg').each(function () {
+            let offsetTop = $(this).offset().top
+            $(this).animate({
+                "top": offsetTop - 58 + 'px'
+            }, 500)
+        })
+    }, 3000)
+    $msgDom.on('mouseenter', function () {
+        top.window.clearTimeout(curTimer)
+        curTimer = top.window.setTimeout(() => {
+            $msgDom.remove()
+        }, 3000)
+    })
+    $msgDom.on('mouseleave', function () {
+        curTimer = top.window.setTimeout(() => {
+            $msgDom.remove()
+        }, 3000)
+    })
+}
+
+function exportToDownloadCenter(title, url, gridId, width, height, ev) {
+    var queryParams = {};
+    var colModel = $("#" + gridId).jqGrid('getGridParam', 'colModel');
+    var fields = "";
+    if (colModel != undefined) {
+        for (var i = 0; i < colModel.length; i++) {
+            if (!colModel[i].hidden && colModel[i].label != null) {
+                fields += colModel[i].name + ",";
+            }
+        }
+    }
+    queryParams['fields'] = fields;
+    //普通的查询
+    $('#' + gridId + "Query").find(":input").each(function () {
+        if (!isEmpty($(this).attr('name'))) {
+            var val = $(this).val();
+            if (val != null && val != '') {
+                val = val.toString();
+            }
+            if (queryParams[$(this).attr('name')]) {
+                val = queryParams[$(this).attr('name')] + "," + val;
+            }
+            queryParams[$(this).attr('name')] = val;
+        }
+    });
+    var sort = $("#" + gridId).jqGrid('getGridParam', 'sortname');
+    queryParams["sort"] = sort;
+
+    var rows = SelectList;
+    if (rows != null && rows.length != 0) {
+        queryParams["ids"] = rows.join(',');
+    }
+
+    // 是否全选与未选的id allSelFlag、noSelIds
+    var gridIdStr = gridId.slice(0,-4)
+    var allSelFlag = window['selectAll_' + gridIdStr]
+    var noSelIds = ''
+    if (Array.isArray(window['noSelList_'+ gridIdStr])) {
+        noSelIds = window['noSelList_'+ gridIdStr].join(',')
+    }
+    queryParams['allSelFlag'] = allSelFlag
+    queryParams['noSelIds'] = noSelIds
+
+    if (queryParams) {
+        // 调用curdtools_jqgrid.js中封装的导出
+        ev = ev || event
+        workCenterExport(url, queryParams, ev ,gridId)
+    }
+}
+//获取个人的个性化设置
+function getSysteGxhsz(path,grid,keyword){
+    let obj ={};
+    obj.path = path;
+    obj.grid = grid;
+    obj.keyword = keyword;
+    if (isEmpty(obj.path) || isEmpty(obj.keyword)) {
+        return {};
+    }
+    let data ={};
+    $.ajax({
+        type: "POST",
+        url:  $("#adminPath").val() +"/system/systemyhzdsz/getSdznpkSzb",
+        data:obj,
+        async : false,
+        success: function (res) {
+            if(res.ret==0){
+                data = res.data;
+            }
+        },error:function (){
+        }
+    });
+    return data;
+}
+
+//保存个人的个性化设置
+function setSysteGxhsz(path,grid,keyword,value){
+    if (isEmpty(path) || isEmpty(keyword) || isEmpty(value)) {
+        return false;
+    }
+    $.ajax({
+        type: "POST",
+        url:  $("#adminPath").val() +"/system/systemyhzdsz/saveSdznpkSzb",
+        data:{
+            path:path,
+            grid:grid,
+            keyword:keyword,
+            paramvalue:value
+        },
+        success: function (res) {
+            if(res.ret == 0){
+                return true;
+            }else{
+                return false
+            }
+        },error:function () {
+            return false;
+        }
+    });
+}
+
+// 全局toast消息方法
+function globalCreateToast(toastText='提示消息'){
+    top.window.postMessage({
+        type: 'workCenterTipsToast',
+        toastContent: toastText,
+    }, '*');
+}
+// 身份证 联系电话 家庭电话 脱敏
+var tmzd = ['sfzjh', 'tel', 'jtdh'] //需要做脱敏的字段
+function desensitization(jqGridId){
+    $(`#${jqGridId}Grid`).bind("jqGridLoadComplete", function (e,res) {
+        let eyeshtml,copyhtml,iconele1,iconele2,xxlx,rowdata,ciphertext;
+        tmzd.forEach(zd=>{
+            var ele=$(`#${jqGridId}Grid .jqgrow td[aria-describedby="${jqGridId}Grid_${zd}"]`);
+            $(ele).each(function(index){
+                iconele1=$(this).find('div.open-eyes-icon,div.close-eyes-icon')
+                iconele2=$(this).find('div.copy-icon')
+                rowdata=res?.results[index] || {}
+                ciphertext=rowdata[zd]; //密文
+                xxlx=res.data
+                rowdata.xxlx=xxlx
+                if(iconele1.length==0 && iconele2.length==0 && !isEmpty(ciphertext)){
+                    eyeshtml = `<div class='close-eyes-icon' onclick="openOrClose(this,'${encodeURIComponent(JSON.stringify(rowdata))}','${zd}','${ciphertext}')" title='显示/隐藏'></div>`
+                    copyhtml = `<div class='copy-icon' onclick="copyPlaintextText('${encodeURIComponent(JSON.stringify(rowdata))}','${zd}')" title='点击复制'></div>`
+                    $(this).append(eyeshtml).append(copyhtml)
+                }
+            })
+        })
+    })
+}
+function getNoMaskInfo(rowdata,zd){
+    console.log('$("#adminPath").val()',$("#adminPath").val())
+    return new Promise((resolve, reject)=>{
+        $.ajax({
+            type: "POST",
+            url:  $("#adminPath").val() +"/system/gridfield/getNoMaskInfo",
+            data:rowdata,
+            success: function (res) {
+                if(res.ret==0 && res.data){
+                    resolve(res.data[zd]); // 解析 Promise
+                }else{
+                    reject(res.msg); // 拒绝 Promise
+                }
+            },error:function () {
+                reject('获取明文失败！'); // 拒绝 Promise
+            }
+        });
+    })
+}
+function openOrClose(eyesBtn,rowdataStr,zd,ciphertext){
+    const rowdata = JSON.parse(decodeURIComponent(rowdataStr));
+    // 获取 td 元素
+    var tdElement = $(eyesBtn).parent('td');
+    // 获取第一层文字节点并替换内容
+    var firstTextNode = tdElement.contents().filter(function() {
+        return this.nodeType === 3; // 选择文本节点
+    }).first();
+    if($(eyesBtn).hasClass('close-eyes-icon')){ //请求接口将密文转为明文
+        getNoMaskInfo(rowdata,zd).then(plaintext=>{
+            firstTextNode.replaceWith(plaintext);
+            $(eyesBtn).removeClass('close-eyes-icon')
+            $(eyesBtn).addClass('open-eyes-icon')
+        }).catch(error=>{
+            layer.msg(error);
+        })
+    }else{ //将明文再换成密文
+        firstTextNode.replaceWith(ciphertext);
+        $(eyesBtn).removeClass('open-eyes-icon')
+        $(eyesBtn).addClass('close-eyes-icon')
+    }
+}
+function copyPlaintextText(rowdataStr,zd) { //不能与系统中其他复制函数名相同 否则会调用这个
+    const rowdata = JSON.parse(decodeURIComponent(rowdataStr));
+    getNoMaskInfo(rowdata,zd).then(plaintext=>{
+        if(!isEmpty(navigator.clipboard)){
+            navigator.clipboard.writeText(plaintext).then(() => {
+                layer.msg('复制成功');
+                swal.close();
+            });
+        }else{
+            var el = document.createElement('div');
+            el.contentEditable = true;
+            el.innerHTML = plaintext;
+            el.style.position = 'absolute';
+            el.style.left = '-9999px';
+            document.body.appendChild(el);
+            el.focus();
+            document.execCommand('selectAll');
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            layer.msg('复制成功');
+            swal.close();
+        }
+    }).catch(error=>{
+        layer.msg(error);
+    })
+}
+
+
+function  getZcMark(zc){
+    if(!isEmpty(zc)){
+        if(zc<1){
+            zc = "T"+(1 - zc);
+        }
+    }
+    return zc;
+}
+
+
+function  getZcNum(zc){
+    if(!isEmpty(zc)){
+        try {
+            if(/^(?:\d+|T\d+)$/.test(zc)){
+                if (zc.startsWith("T")) {
+                    zc = 1-zc.substring(1);
+                }
+            }
+        }catch (e){
+            console.log(e);
+            zc = '';
+        }
+    }
+    return zc;
+}
+
+function isAllEnglish(str) {
+    return /^[A-Za-z]+$/.test(str);
+}
+
+function isNotAllEnglish(str) {
+    return !isAllEnglish(str);
+}
+
+
+
+

@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<!-- saved from url=(0039)https://jlau.jw.chaoxing.com/admin/main -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>学生端登录首页</title>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+                 <link rel="shortcut icon" href="https://jlau.jw.chaoxing.com/static/common/favicon.ico?_t=1720087656764">
+<link href="./bootstrap.min.css" rel="stylesheet">
+<link href="./font-awesome.min.css" rel="stylesheet">
+<link href="./animate.css" rel="stylesheet">
+
+    <script src="./jquery.min.js.下载"></script>
+<script src="./bootstrap.min.js.下载"></script>
+<script src="./jquery-ui.min.js.下载"></script>
+
+    <!-- jqGrid curdtools-->
+		<script src="./curdtools_jqgrid.js.下载"></script>
+
+
+    <link href="./stuIndex.css" rel="stylesheet">
+    <script src="./web-animations.min.js.下载"></script>
+    <script src="./hammer.js.下载"></script>
+    <script src="./muuri.js.下载"></script>
+    <script src="./jquery.simpler-sidebar.js.下载"></script>
+
+    
+
+    
+
+    
+
+
+    <style>
+        li{ float:left; list-style:none}
+        /* CSS注释：加list-style:none去掉li默认产生”点“ */
+    
+    </style>
+</head>
+
+<body class="images-loaded">
+
+<div class="mainContainer">
+    <input type="hidden" id="adminPath" value="/admin">
+    
+    <div class="controlBlock">
+        <!--悬浮按钮-->
+        <div class="floatDiv">
+            <a id="sidebar-main-trigger" class="openBarList" href="https://jlau.jw.chaoxing.com/admin/main#"></a>
+        </div>
+        <!--折叠隐藏部分-->
+        <div class="sidebar main right" id="sidebar-main" data-sidebar-main="closed" style="position: fixed; top: 0px; bottom: 0px; width: 10%; z-index: 3000;">
+            <div class="wrapper">
+                <div class="showBlock">
+                    <p class="removeBlock">
+                        <span class="hiddenIcon"></span>
+                        点击隐藏
+                    </p>
+                    <ul class="showListMenu">
+                        
+                            
+                            <li class="addBtn" id="grkb">
+                                <a href="javascript:void(0);">
+                                        个人课表
+                                        
+                                </a>
+                            </li>
+                            
+                        
+                            
+                            <li class="addBtn" id="tzgg">
+                                <a href="javascript:void(0);">
+                                        通知公告
+                                        
+                                </a>
+                            </li>
+                            
+                        
+                            
+                            <li class="addBtn" id="kjrk">
+                                <a href="javascript:void(0);">
+                                        快捷入口
+                                        
+                                </a>
+                            </li>
+                            
+                        
+                    </ul>
+                </div>
+
+                <div class="hideBlock">
+                    <p class="addBlock">
+                        <span class="showIcon"></span>
+                        点击添加
+                    </p>
+                    <ul class="hideListMenu">
+
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+        
+        <i class="shape"></i>
+        <div class="scrollTitle lf">当前时间：</div>
+        <div id="scrollBox">
+            <ul id="con1">
+
+                <li id="clock" class="navTitle"><span id="clock_year">2024</span><span>年</span><span id="clock_month">7</span>
+                    <span>月</span><span id="clock_day">10</span><span>日</span>&nbsp;&nbsp;<span id="clock_xq">星期三</span>&nbsp;&nbsp;<span id="clock_sj">14:45:33</span></li>
+                <li class="navTitle">&nbsp;&nbsp;&nbsp;&nbsp;</li>
+                <li class="navTitle"><span>第</span><span>周</span></li>
+                <li class="navTitle">&nbsp;&nbsp;&nbsp;&nbsp;</li>
+                <li class="navTitle">2023-2024-2</li>
+
+            </ul>
+        </div>
+        
+            
+        
+            
+        
+            
+        
+    </div>
+
+    
+
+    
+
+    
+
+    <div class="personalInformation">
+        <div class="PersonalPicture">
+            
+                
+                    <img class="stuImg" src="./default_avatar_male.jpg">
+                
+                
+            
+            
+        </div>
+        <div class="mainPart">
+            <div class="basicMessage">
+                
+                    <span class="stuName">吴震</span>
+                    <span class="xuehao">2212101004</span>
+                
+                
+                
+                
+                    
+                    
+                    
+                    
+                    <span class="banji">2022  —  信息技术学院  —  计算机科学与技术 —  22计算机3班</span>
+                
+            </div>
+
+            
+            
+
+            
+            
+                <div class="blueBar">
+                    <div class="progressContainer">
+                        <div id="progressbar" class="ui-progressbar ui-widget ui-widget-content ui-corner-all" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="ui-progressbar-value ui-widget-header ui-corner-left" style="display: none; width: 0%;"></div></div>
+                        <div class="numberContainer">
+                            <div class="Credits">
+                                <i class="circle1"></i>
+                                <span class="CreditTitle">已修学分:</span>
+                                <span class="CreditNum">98.5</span>
+                            </div>
+                            <div class="totalCredits">
+                                <i class="circle2"></i>
+                                <span class="totalCreditsTitle">总学分:</span>
+                                <span class="totalCreditsNum">0.0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            
+        </div>
+    </div>
+
+
+
+
+    
+    <div id="itemContainer" class="grid muuri" style="height: 660px;">
+        
+            
+            <div class="item muuri-item muuri-item-shown" id="grkbDiv" data-id="3" style="left: 0px; top: 0px; transform: translateX(0px) translateY(0px); display: block; touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
+                <div class="item-content moduleContainer" style="opacity: 1; transform: scale(1);">
+                    <div class="mainContain">
+                        <div class="mask" style="width: 100%;height: 100%;text-align: center">
+                            <span style="color: #4B86E9;font-weight: bold;vertical-align: middle;">个人课表</span>
+                            <iframe id="grkbFrame" class="commentIframe" src="./grkb.html"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        
+            
+            <div class="item muuri-item muuri-item-shown" id="tzggDiv" data-id="5" style="left: 0px; top: 0px; transform: translateX(549px) translateY(0px); display: block; touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
+                <div class="item-content moduleContainer" style="opacity: 1; transform: scale(1);">
+                    <div class="mainContain">
+                        <div class="mask" style="width: 100%;height: 100%;text-align: center">
+                            <span style="color: #4B86E9;font-weight: bold;vertical-align: middle;">通知公告</span>
+                            <iframe id="tzggFrame" class="commentIframe" src="./xsdtzgg.html"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        
+            
+            <div class="item muuri-item muuri-item-shown" id="kjrkDiv" data-id="6" style="left: 0px; top: 0px; transform: translateX(0px) translateY(330px); display: block; touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
+                <div class="item-content moduleContainer" style="opacity: 1; transform: scale(1);">
+                    <div class="mainContain">
+                        <div class="mask" style="width: 100%;height: 100%;text-align: center">
+                            <span style="color: #4B86E9;font-weight: bold;vertical-align: middle;">快捷入口</span>
+                            <iframe id="kjrkFrame" class="commentIframe" src="./kjrk.html"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $(function() {
+        var num = 0;
+        if ('0.0' != 0){
+            num = '98.5'/'0.0' * 100;
+        }
+        $("#progressbar").progressbar({
+            value: num
+        });
+
+        //侧边栏
+        var $mainSidebar = $( "#sidebar-main" );
+
+        $mainSidebar.simplerSidebar( {
+            attr: "sidebar-main",
+            selectors: {
+                trigger: "#sidebar-main-trigger",
+                quitter: ".quitter"
+            },
+            animation: {
+                easing: "easeOutQuint"
+            }
+        } );
+
+    });
+
+    function realSysTime(clock){
+        var now=new Date(); //创建Date对象
+        var hour=now.getHours(); //获取小时
+        if(hour < 10){
+            hour = "0"+hour;
+        }
+        var minu=now.getMinutes(); //获取分钟
+        if(minu < 10){
+            minu = "0"+minu;
+        }
+        var sec=now.getSeconds(); //获取秒钟
+        if(sec < 10){
+            sec = "0"+sec;
+        }
+        $("#clock_sj").html(hour+":"+minu+":"+sec);
+    }
+
+    window.onload = function(){
+        window.setInterval("realSysTime(clock)",1000);
+        var yysz = getCookie("yysz");
+        var now=new Date(); //创建Date对象
+        var year=now.getFullYear(); //获取年份
+        var month=now.getMonth(); //获取月份
+        var date=now.getDate(); //获取日期
+        var day=now.getDay(); //获取星期
+        month=month+1;
+        var arr_week=["星期日","星期一","星期二","星期三","星期四","星期五","星期六"];
+        var week=arr_week[day]; //获取中文的星期
+        $("#clock_year").html(year);
+        $("#clock_month").html(month);
+        $("#clock_day").html(date);
+        $("#clock_xq").html(week);
+        var hour=now.getHours(); //获取小时
+        if(hour < 10){
+            hour = "0"+hour;
+        }
+        var minu=now.getMinutes(); //获取分钟
+        if(minu < 10){
+            minu = "0"+minu;
+        }
+        var sec=now.getSeconds(); //获取秒钟
+        if(sec < 10){
+            sec = "0"+sec;
+        }
+        $("#clock_sj").html(hour+":"+minu+":"+sec);
+        var transMap;
+        $.ajax({
+            type: "GET",
+            url:  "/admin/system/gridfield/getTranslation",
+            dataType: "json",
+            data:{
+                yysz:yysz
+            },
+            async: false,
+            success: function (data) {
+                //yysz = data.extend.yysz;
+                if(data.ret!=-1){
+                    transMap = data.extend.transMap;
+                }
+            }
+        });
+        if (!(transMap == null || transMap.length == 0)) {
+            translationAllHtml(transMap, document.children);
+        }
+        // 判断是否是初始密码，初始密码提示修改
+        if ("1" == '0'){
+            top.layer.alert('您的密码强度较弱，请修改密码', {
+            	  closeBtn: 0
+            	}, function(){
+            		 changePass("请修改初始密码", "/admin/system/usermanage/9caebd8226284fb5856c294bcc7498c3/changePassword", "", "", "");
+                     top.layer.msg('修改后请牢记你的密码', {icon: 0});
+            	});
+        }
+        if("xs"=='xs' && "1" == '0' && '10193' != "13869" ){
+            if("1"=='0'){
+                var width = '100%';
+                var height = '100%';
+                var title="学生基本信息修改";
+                var url = "/admin/xjgl/xsjbxxsq/edit1";
+                if(navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){//如果是移动端，就使用自适应大小弹窗
+                    width='auto';
+                    height='auto';
+                }else{//如果是PC端，根据用户设置的width和height显示。
+
+                }
+                var closeStatus = '0';
+                var i = parseInt(closeStatus);
+                top.layer.open({
+                    type: 2,
+                    area: [width, height],
+                    closeBtn: i,//开启右上角关闭按钮
+                    title: title,
+                    maxmin: false, //开启最大化最小化按钮
+                    content: url ,
+                    success: function(layero, index){
+                        //遍历父页面的button,使其失去焦点，再按enter键就不会弹框了
+                        $(":button").each(function () {
+                            $(this).blur();
+                        });
+                    },
+                    btn: ['提交申请'],
+                    yes: function(index, layero){
+                        var body = top.layer.getChildFrame('body', index);
+                        var iframeWin = layero.find('iframe')[0]; //得到iframe页的窗口对象，执行iframe页的方法：iframeWin.method();
+                        iframeWin.contentWindow.doSubmit(function()
+                        {
+                            //判断逻辑并关闭
+                            setTimeout(function(){top.layer.close(index);}, 100);//延时0.1秒，对应360 7.1版本bug
+                            SelectList = [];
+                        });
+                    }
+                });
+            }
+        }
+        if("xs"=='xs' && "0"=='0' && '10193'=="13869"){
+        	   	var width = '100%';
+        	   	var height = '100%';
+        	   	var title="学生基本信息修改申请";
+                var url="/admin/xjgl/xsjbxxsq/edit";
+        	   	if(navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){//如果是移动端，就使用自适应大小弹窗
+        	   		width='auto';
+        	   		height='auto';
+        	   	}else{//如果是PC端，根据用户设置的width和height显示。
+        	   	
+        	   	}
+        	   	top.layer.open({
+        	   	    type: 2,  
+        	   	    area: [width, height],
+        	   	    title: title,
+        	        maxmin: false, //开启最大化最小化按钮
+        	   	    content: url ,
+        	   	    success: function(layero, index){
+        	   	    	//遍历父页面的button,使其失去焦点，再按enter键就不会弹框了
+        	               $(":button").each(function () {
+        	                   $(this).blur();
+        	               });
+        	   	    },
+        	   	    btn: ['提交申请'],
+        	   	    yes: function(index, layero){
+        	   	    	 var body = top.layer.getChildFrame('body', index);
+        	   	         var iframeWin = layero.find('iframe')[0]; //得到iframe页的窗口对象，执行iframe页的方法：iframeWin.method();
+       	   	   	         iframeWin.contentWindow.doSubmit(function()
+       	   	   	   	         {
+       	   	   	   	        	 //判断逻辑并关闭
+       	   	   	          	         setTimeout(function(){top.layer.close(index);}, 100);//延时0.1秒，对应360 7.1版本bug
+       	   	   	          	         SelectList = [];
+       	   	   	   	         });
+        	   		  }
+        	   	});
+        }
+        if("ls"=='xs' && "1" == '0'){
+            if("1"=='0'){
+                var width = '100%';
+                var height = '100%';
+                var title="教师基本信息修改";
+                var url = "/admin/sz/szjsjbxx/update/"+'';
+                if(navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){//如果是移动端，就使用自适应大小弹窗
+                    width='auto';
+                    height='auto';
+                }else{//如果是PC端，根据用户设置的width和height显示。
+
+                }
+                var closeStatus = '0';
+                var i = parseInt(closeStatus);
+                top.layer.open({
+                    type: 2,
+                    area: [width, height],
+                    closeBtn: i,//开启右上角关闭按钮
+                    title: title,
+                    maxmin: false, //开启最大化最小化按钮
+                    content: url ,
+                    success: function(layero, index){
+                        //遍历父页面的button,使其失去焦点，再按enter键就不会弹框了
+                        $(":button").each(function () {
+                            $(this).blur();
+                        });
+                    },
+                    btn: ['确定提交'],
+                    yes: function(index, layero){
+                        var body = top.layer.getChildFrame('body', index);
+                        var iframeWin = layero.find('iframe')[0]; //得到iframe页的窗口对象，执行iframe页的方法：iframeWin.method();
+                        var flag = iframeWin.contentWindow.check();
+                        if(flag){
+                            iframeWin.contentWindow.doSubmit(function () {
+                                //判断逻辑并关闭
+                                setTimeout(function () {
+                                    top.layer.close(index)
+                                }, 100);//延时0.1秒，对应360 7.1版本bug
+                                SelectList = [];
+                            });
+                        }
+                    }
+                });
+            }
+        }
+
+        //  学生端登录后是否立即弹出【学生信息修改申请】
+        if ("xs" == 'xs' && "1" == '0') {
+            var width = '98%';
+            var height = '95%';
+            var sfxysxqm = '';
+            var title = "学生信息修改申请";
+            if ("1" == sfxysxqm) {
+                title = "学生信息确认";
+            }
+            var url = "/admin/xjgl/xsxxbgsq";
+            if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {//如果是移动端，就使用自适应大小弹窗
+                width = 'auto';
+                height = 'auto';
+            } else {//如果是PC端，根据用户设置的width和height显示。
+
+            }
+            top.layer.open({
+                type: 2,
+                area: [width, height],
+                closeBtn: 1,//开启右上角关闭按钮
+                title: title,
+                maxmin: true, //开启最大化最小化按钮
+                content: url,
+                success: function (layero, index) {
+                    //遍历父页面的button,使其失去焦点，再按enter键就不会弹框了
+                    $(":button").each(function () {
+                        $(this).blur();
+                    });
+                }
+            });
+        }
+        // 学生端登录后是否立即弹出【考试信息】
+        if ("xs" == 'xs' && "1" == '0') {
+            var width = '60%';
+            var height = '65%';
+            var title = "<img src='/static/img/kwgl/gantai.png?_t=1720087656764' style='margin-right: 5px;height: 20px;'>学业预警";
+            var url = "/admin/xsd/kwglXsdKscx/tklist?xm="+'吴震';
+            if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {//如果是移动端，就使用自适应大小弹窗
+                width = 'auto';
+                height = 'auto';
+            } else {//如果是PC端，根据用户设置的width和height显示。
+
+            }
+            top.layer.open({
+                type: 2,
+                area: [width, height],
+                closeBtn: 1,//开启右上角关闭按钮
+                title: title,
+                maxmin: true, //开启最大化最小化按钮
+                content: url,
+                success: function (layero, index) {
+                    //遍历父页面的button,使其失去焦点，再按enter键就不会弹框了
+                    $(":button").each(function () {
+                        $(this).blur();
+                    });
+                }
+            });
+        }
+        // 学生端登录后是否立即弹出【重修通知】
+        if ("xs" == 'xs' && "1" == '0') {
+            var width = '60%';
+            var height = '65%';
+            var title = "<img src='/static/img/kwgl/gantai.png?_t=1720087656764' style='margin-right: 5px;height: 20px;'>学业预警";
+            var url = "/admin/xsd/kwglXsdKscx/cxkclist?xm="+'吴震';
+            if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {//如果是移动端，就使用自适应大小弹窗
+                width = 'auto';
+                height = 'auto';
+            } else {//如果是PC端，根据用户设置的width和height显示。
+
+            }
+            top.layer.open({
+                type: 2,
+                area: [width, height],
+                closeBtn: 1,//开启右上角关闭按钮
+                title: title,
+                maxmin: true, //开启最大化最小化按钮
+                content: url,
+                success: function (layero, index) {
+                    //遍历父页面的button,使其失去焦点，再按enter键就不会弹框了
+                    $(":button").each(function () {
+                        $(this).blur();
+                    });
+                }
+            });
+        }
+
+    };/*实时获取并显示系统时间*/
+
+
+    function changePass(title, url,width, height,target){
+        width = width ? width : '800px';
+        height = height ? height : '500px';
+        if (navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)) {// 如果是移动端，就使用自适应大小弹窗
+            width = 'auto';
+            height = 'auto';
+        } else {// 如果是PC端，根据用户设置的width和height显示。
+
+        }
+        top.layer.open({
+            type : 2,
+            area : [ width, height ],
+            title : title,
+            maxmin : false, // 开启最大化最小化按钮
+            content : url,
+            closeBtn:0,
+            btn : [ '确定'],
+            yes : function(index, layero) {
+
+                var iframeWin = layero.find('iframe')[0]; // 得到iframe页的窗口对象，执行iframe页的方法：iframeWin.method();
+
+                iframeWin.contentWindow.doSubmit( function() {
+                    top.layer.close(index);
+                    top.layer.close(top.layer.load(0));
+                });
+            },
+            scrollbar: false,
+            cancel : function() {
+                // top.layer.alert("您的密码强度弱，请修改密码", {icon: 0, title:'提示'});
+                // return false;
+            }
+        });
+    }
+
+
+</script>
+<script src="./index.js.下载"></script>
+<!-- jqGrid curdtools-->
+		<script src="./curdtools_jqgrid.js.下载"></script>
+
+
+
+<div data-sidebar-main="mask" style="position: fixed; inset: 0px; z-index: 2999; display: none; background-color: rgb(0, 0, 0); opacity: 0.5;"></div><div id="phraseJoinewrskdfdswerhnyikyofd" data-v-app=""><!----><!----><!----></div></body></html>

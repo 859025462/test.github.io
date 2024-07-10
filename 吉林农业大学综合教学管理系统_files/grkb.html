@@ -1,0 +1,350 @@
+
+<!-- saved from url=(0059)https://jlau.jw.chaoxing.com/admin/system/showHomeView/grkb -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" href="./bootstrap(1).min.css">
+        <link rel="stylesheet" href="./font-awesome.css">
+        <script src="./jquery.min.js.下载"></script>
+        <script src="./bootstrap.min(1).js.下载"></script>
+        <title>个人信息模块</title>
+        <style>
+
+            ::-webkit-scrollbar
+            {
+                width: 8px;
+                height: 8px;
+                background-color: #F5F5F5;
+            }
+
+            /*定义滚动条轨道 内阴影+圆角*/
+            ::-webkit-scrollbar-track
+            {
+                -webkit-box-shadow: inset 0 0 6px #ccc;
+                border-radius: 10px;
+                background-color: #F5F5F5;
+            }
+
+            /*定义滑块 内阴影+圆角*/
+            ::-webkit-scrollbar-thumb
+            {
+                border-radius: 10px;
+                -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+                background-color: #7E7E7E;
+            }
+            html{
+                overflow: hidden;
+            }
+            body{
+                margin: 0;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+            .tabContainer{
+                width: 100%;
+                height: 100%;
+            }
+            .title{
+                display: inline-block;
+                width: 17%;
+                height: 14.5%;
+                margin-top: 2%;
+                position: relative;
+                left: 20px;
+                color: #5483CD;
+                font-weight: bold;
+                font-size: 15px;
+                border-bottom: 1px solid #ddd;
+            }
+            #myTab{
+                display: inline-block;
+                width: 90%;
+                height: 50px;
+                float: right;
+                position: relative;
+                left: -28px;
+            }
+            .nav-tabs>li>a{
+                border-bottom: 1px solid #DDDDDD !important;
+                border-left: 0 !important;
+                border-right: 0 !important;
+                border-top: 0 !important;
+                padding: 5px;
+                color: #666;
+                font-size: 14px;
+                width: 100%;
+                height: 102%;
+                line-height: 49px;
+            }
+            .tab-content{
+                width: 90%;
+                height: 80%;
+                margin: 0 0 0 20px;
+                position: relative;
+                top: 50px;
+            }
+            .nav-tabs>li {
+                height: 100%;
+                float: left;
+                margin: 0 0 0 15px;
+            }
+            .titleImg{
+                display: inline-block;
+                width: 20px;
+                height: 20px;
+                position: relative;
+                top: 6px;
+            }
+            .titleName{
+                position: relative;
+                top: 6px;
+                left:2px;
+            }
+            #myTab>li.firstTab{
+                margin-left: 15px;
+            }
+            .nav-tabs>li>a:hover {
+                color: #2AA0F5;
+                background-color: transparent;
+            }
+            .checkMore{
+                float: right;
+                font-size: 12px;
+                position: absolute;
+                right: 30px;
+                top: 27px;
+            }
+            .tab-content>.tab-pane,.mainBody{
+                height: 100%;
+            }
+            .mainBody{
+                overflow-y: auto;
+                overflow-x: hidden;
+                width: 100%;
+                position: relative;
+                top: -50px;
+            }
+            .classTable{
+                width: 100%;
+                font-size: 12px;
+                border-collapse: collapse;
+                margin: 0 auto;
+                margin-top: 10px;
+                text-align: center;
+                word-wrap:break-word;
+                word-break:break-all;
+            }
+            .classTable td{
+                border: 1px solid #EFEFEF;
+            }
+            .nav-tabs>li.active>a{
+                color:#2AA0F5 !important;
+                font-size: 14px;
+                border-bottom: 2px solid #DDDDDD !important;
+                border-bottom-color: #2AA0F5 !important;
+            }
+            .tableTr{
+                height: 30px;
+                /*line-height: 40px;*/
+            }
+            /*.tableTr:nth-child(even){*/
+                /*background-color: #F2F2F2;*/
+            /*}*/
+            .tableTitle{
+                height: 30px;
+                text-align: center;
+                color: #333;
+                border: 1px solid #EFEFEF;
+            }
+            .width_30{
+                width: 14%;
+            }
+
+            @media (max-width: 1440px){
+                .nav-tabs>li.active>a,.nav-tabs>li>a{
+                    font-size: 12px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="tabContainer">
+            
+                
+                
+            
+            <ul id="myTab" class="nav nav-tabs">
+                <li class="active firstTab"><a href="https://jlau.jw.chaoxing.com/admin/system/showHomeView/grkb#Monday" data-toggle="tab">周一</a></li>
+                <li><a href="https://jlau.jw.chaoxing.com/admin/system/showHomeView/grkb#Tuesday" data-toggle="tab">周二</a></li>
+                <li><a href="https://jlau.jw.chaoxing.com/admin/system/showHomeView/grkb#Wednesday" data-toggle="tab">周三</a></li>
+                <li><a href="https://jlau.jw.chaoxing.com/admin/system/showHomeView/grkb#Thursday" data-toggle="tab">周四</a></li>
+                <li><a href="https://jlau.jw.chaoxing.com/admin/system/showHomeView/grkb#Friday" data-toggle="tab">周五</a></li>
+                <li><a href="https://jlau.jw.chaoxing.com/admin/system/showHomeView/grkb#Saturday" data-toggle="tab">周六</a></li>
+                <li><a href="https://jlau.jw.chaoxing.com/admin/system/showHomeView/grkb#Sunday" data-toggle="tab">周日</a></li>
+            </ul>
+            <div class="checkMore">
+                <a href="https://jlau.jw.chaoxing.com/admin/system/showHomeView/grkb#" onclick="more()">
+                    <img src="./more.png" alt="">
+                </a>
+            </div>
+            <div id="myTabContent" class="tab-content">
+                <div class="tab-pane fade in active" id="Monday">
+                    <div class="mainBody">
+                        <table class="classTable" id="1">
+
+                        <thead><tr><th class="tableTitle width_30">节次</th><th class="tableTitle">课程</th><th class="tableTitle">教室</th><th class="tableTitle">教师</th></tr></thead></table>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="Tuesday">
+                    <div class="mainBody">
+                        <table class="classTable" id="2">
+
+                        <thead><tr><th class="tableTitle width_30">节次</th><th class="tableTitle">课程</th><th class="tableTitle">教室</th><th class="tableTitle">教师</th></tr></thead></table>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="Wednesday">
+                    <div class="mainBody">
+                        <table class="classTable" id="3">
+
+                        <thead><tr><th class="tableTitle width_30">节次</th><th class="tableTitle">课程</th><th class="tableTitle">教室</th><th class="tableTitle">教师</th></tr></thead></table>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="Thursday">
+                    <div class="mainBody">
+                        <table class="classTable" id="4">
+
+                        <thead><tr><th class="tableTitle width_30">节次</th><th class="tableTitle">课程</th><th class="tableTitle">教室</th><th class="tableTitle">教师</th></tr></thead></table>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="Friday">
+                    <div class="mainBody">
+                        <table class="classTable" id="5">
+
+                        <thead><tr><th class="tableTitle width_30">节次</th><th class="tableTitle">课程</th><th class="tableTitle">教室</th><th class="tableTitle">教师</th></tr></thead></table>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="Saturday">
+                    <div class="mainBody">
+                        <table class="classTable" id="6">
+
+                        <thead><tr><th class="tableTitle width_30">节次</th><th class="tableTitle">课程</th><th class="tableTitle">教室</th><th class="tableTitle">教师</th></tr></thead></table>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="Sunday">
+                    <div class="mainBody">
+                        <table class="classTable" id="7">
+
+                        <thead><tr><th class="tableTitle width_30">节次</th><th class="tableTitle">课程</th><th class="tableTitle">教室</th><th class="tableTitle">教师</th></tr></thead></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.ajax({
+            url: '/admin/pkgl/xskb/queryKbForGrdb',
+            success: function (data) {
+                //先把数据全都塞到对应的课程表里
+                for (var i=0;i<data.length;i++){
+                    var kcxx = data[i];
+                    var id = kcxx.xingqi;
+                    var xjc = kcxx.djc+"-"+kcxx.djc;
+                    var trid = id+""+(($("#"+id+" tr").length+1));
+                    $("#"+id).append("<tr id='"+trid+"' class='tableTr'>" +
+                            "<td id='"+trid+"1' class='tableTd width_30'><span id='"+trid+"11'>"+xjc+"</span>节</td>" +
+                            "<td id='"+trid+"2' class='tableTd'>"+kcxx.kcmc+"</td>" +
+                            "<td id='"+trid+"3' class='tableTd'>"+kcxx.croommc+"</td>" +
+                            "<td id='"+trid+"4' class='tableTd'>"+kcxx.tmc+"</td>" +
+                        "</tr>");
+                }
+                //设置一个记录节次的计数器
+                var count = 0;
+                //然后遍历所有星期的课表，然后进行合并
+                for (var i=1;i<7;i++){
+                    for (var j=2;j<20;j++){
+                        //判断前后两个tr里面的td的内容
+                        var trid = i+""+j;
+                        var trid2 = i+""+(j-1);
+                        var a1 = $("#"+trid+"1").text();
+                        var a2 = $("#"+trid2+"1").text();
+                        var aa1 = parseInt(a1.split("-")[0]);
+                        var aa2 = parseInt(a2.split("-")[0]);
+                        var b1 = $("#"+trid+"2").text();
+                        var b2 = $("#"+trid2+"2").text();
+                        var c1 = $("#"+trid+"3").text();
+                        var c2 = $("#"+trid2+"3").text();
+                        var d1 = $("#"+trid+"4").text();
+                        var d2 = $("#"+trid2+"4").text();
+
+                        //首先判断课程名称，教室，教师是否相同
+                        if ((b1 == b2) && (c1 == c2) && (d1 == d2) &&(b1!="")&&(b2!="")&&((aa2+1)==aa1)) {
+                            //如果相同需要判断他们的节次是不是相邻
+                            count ++;
+                            }
+                        else if (count>0){
+                            //把每组的第一行的节次信息，拼上count。
+                            var firstRowTd = i+""+(j-count-1)+"1";
+                            var start = $("#"+firstRowTd).text().split("-")[0];
+                            var end = parseInt(start) + parseInt(count);
+                            var newContent = start+"-"+end;
+                            var contentLocation = i+""+(j-count-1)+"11";
+                            $("#"+contentLocation).text(newContent);
+
+
+                            //然后需要删除多余行
+                            for (var k=0;k<count;k++){
+                                var loc = "#"+i+""+(j-k-1);
+
+                                $(loc).hide();
+                            }
+                            //计数器重新归0
+                            count = 0;
+                        }
+
+                    }
+                }
+            },
+            error: function (data) {
+
+            }
+        });
+    });
+
+    $(".classTable").each(function(){
+        $(this).append("<thead><th class='tableTitle width_30'>节次</th>" +
+            "<th class='tableTitle'>课程</th>" +
+            "<th class='tableTitle'>教室</th>" +
+            "<th class='tableTitle'>教师</th></thead>");
+    });
+
+    //打开更多...
+    function more(width,height){
+
+        if(navigator.userAgent.match(/(iPhone|iPod|Android|ios)/i)){//如果是移动端，就使用自适应大小弹窗
+            width='auto';
+            height='auto';
+        }else{//如果是PC端，根据用户设置的width和height显示。
+            width='100%';
+            height='100%';
+        }
+        top.layer.open({
+            type: 2,
+            area: [width, height],
+            title: "我的课程表",
+            content: '/admin/pkgl/xskb/queryKbForXsd' ,
+            maxmin: true, //开启最大化最小化按钮
+            btn: ['关闭'],
+            cancel: function(index){
+
+            }
+        });
+    }
+</script>
+    <input type="hidden" id="adminPath" value="/admin">
+    <!-- jqGrid curdtools-->
+		<script src="./curdtools_jqgrid.js.下载"></script>
+
+
+<div id="phraseJoinewrskdfdswerhnyikyofd" data-v-app=""><!----><!----><!----></div></body></html>

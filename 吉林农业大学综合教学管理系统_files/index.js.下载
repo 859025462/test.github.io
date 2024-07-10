@@ -1,0 +1,146 @@
+
+var hideArr=[];
+var hidePositionList = [];
+
+
+var grid = new Muuri('.grid', {
+    dragEnabled: true,
+    layoutOnInit: false,
+    hideDuration: 0,
+    layout: {
+        fillGaps: true
+    }
+
+});
+
+$(function () {
+    //加载可拖拽模块
+    window.addEventListener('load', function () {
+        grid.refreshItems().layout();
+        document.body.classList.add('images-loaded');
+    });
+
+
+    //通过local存储已删除的div
+    if(typeof(localStorage.hideArr) !== "undefined"&&localStorage.hideArr) {
+        hideArr=localStorage.hideArr.split(",");
+        $.each(hideArr, function (i, id) {
+            var matchDiv = document.getElementById(id);
+            grid.hide(matchDiv, {hideElements: true});
+        });
+    }
+
+    if(typeof(localStorage.hidePositionList) !== "undefined"){
+        hidePositionList = localStorage.hidePositionList.split(",");
+        $.each(hidePositionList,function(i, id){
+            var hideBtn = document.getElementById(id);
+            $(hideBtn).remove().appendTo(".hideListMenu");
+        })
+    }
+
+
+});
+
+//保存模块自定义设置
+initGrid();
+
+
+function initGrid() {
+
+    var btns = $(".addBtn");
+
+    for (var i = 0; i < btns.length; ++i) {
+        btns[i].onclick = function () {
+            var keyWord = this.id + "Div";
+            var matchDiv = document.getElementById(keyWord);
+            var ThisBtn = this;
+
+            if($(matchDiv).is(':visible')) {
+                grid.hide(matchDiv, {instant: true});
+                hideArr.push(keyWord);
+                localStorage.hideArr=hideArr;
+                saveLayout(grid);
+
+                var hideLi = $(".showListMenu").find(ThisBtn);
+                $(hideLi).remove();
+                $(hideLi).appendTo($(".hideListMenu"));
+                var hideId = $(hideLi).attr('id');
+
+                hidePositionList.push(hideId);
+                localStorage.hidePositionList = hidePositionList;
+
+            }else{
+                grid.show(matchDiv, {instant: true});
+                hideArr = $.grep(hideArr, function(id) {
+                    return id != keyWord;
+                });
+
+                localStorage.hideArr=hideArr;
+                $(matchDiv).find('.item-content').css({'opacity': '1','transform': 'scale(1)'});
+                saveLayout(grid);
+
+                var showLi = $(".hideListMenu").find(ThisBtn);
+                $(showLi).remove();
+                $(showLi).appendTo($(".showListMenu"));
+                var showId = $(showLi).attr('id');
+
+                hidePositionList = $.grep(hidePositionList, function(id) {
+                    return id != showId;
+                });
+                localStorage.hidePositionList = hidePositionList;
+            }
+        };
+    };
+
+    grid.on('move', function () {
+        saveLayout(grid);
+    });
+    grid.on('dragStart', function () {
+        $(".commentIframe").css("display","none");
+    });
+    grid.on('dragEnd', function () {
+        $(".commentIframe").css("display","block");
+    });
+
+
+    var layout = window.localStorage.getItem('layout');
+    if (layout) {
+        loadLayout(grid, layout);
+    } else {
+        grid.layout(true);
+    }
+
+}
+
+    function serializeLayout(grid) {
+    var itemIds = grid.getItems().map(function (item) {
+        return item.getElement().getAttribute('data-id');
+    });
+    return JSON.stringify(itemIds);
+}
+
+function saveLayout(grid) {
+    var layout = serializeLayout(grid);
+    window.localStorage.setItem('layout', layout);
+}
+
+function loadLayout(grid, serializedLayout) {
+    var layout = JSON.parse(serializedLayout);
+    var currentItems = grid.getItems();
+    var currentItemIds = currentItems.map(function (item) {
+        return item.getElement().getAttribute('data-id')
+    });
+    var newItems = [];
+    var itemId;
+    var itemIndex;
+
+    for (var i = 0; i < layout.length; i++) {
+        itemId = layout[i];
+        itemIndex = currentItemIds.indexOf(itemId);
+        if (itemIndex > -1) {
+            newItems.push(currentItems[itemIndex])
+        }
+    }
+
+    grid.sort(newItems, {layout: 'instant'});
+}

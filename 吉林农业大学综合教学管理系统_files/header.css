@@ -1,0 +1,227 @@
+.workCenterInfo {
+  position: relative;
+  float: left;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  width: 34px;
+  margin-left: 10px;
+  font-family: PingFang SC;
+}
+.workCenterInfo .work-center-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  opacity: 0.8;
+}
+.workCenterInfo .work-center-icon:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  opacity: 1;
+}
+.workCenterInfo .work-center-icon .icon {
+  width: 22px;
+  height: 22px;
+  background-image: url('../img/index-icon.png');
+  background-size: 100%;
+}
+.workCenterInfo .work-center-icon .tips-num-wrap {
+  position: absolute;
+  right: 0px;
+  top: -2px;
+  transform: translateX(50%);
+  background-color: #E05847;
+  height: 16px;
+  line-height: 16px;
+  border-radius: 8px;
+  padding: 0 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  display: none;
+}
+.workCenterInfo .work-center-icon .tips-num-wrap .tips-num {
+  font-family: PingFang SC;
+  font-size: 12px;
+  transform-origin: center;
+  font-weight: 500;
+  letter-spacing: 0px;
+  color: #fff;
+}
+.workCenterInfo .work-center-wrap {
+  position: absolute;
+  top: 60px;
+  min-width: 150px;
+  right: 0;
+  padding: 6px 0;
+  font-family: Microsoft YaHei;
+  background-color: #fff;
+  border-radius: 6px;
+  box-shadow: 0px 2px 12px 0px #00255933;
+  line-height: 1;
+  display: none;
+}
+.workCenterInfo .work-center-wrap::after {
+  display: block;
+  content: '';
+  position: absolute;
+  top: -6px;
+  right: 12px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 6px solid #ffffff;
+}
+.workCenterInfo .work-center-wrap .hover-row {
+  width: 100%;
+  background-color: transparent;
+  height: 16px;
+  position: absolute;
+  left: 0;
+  top: -16px;
+}
+.workCenterInfo .work-center-wrap .list-wrap .list-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0;
+  cursor: pointer;
+  color: #666;
+  white-space: nowrap;
+}
+.workCenterInfo .work-center-wrap .list-wrap .list-item .item-icon {
+  margin-right: 8px;
+  width: 16px;
+  height: 16px;
+  background-size: 100%;
+  flex-shrink: 0;
+}
+.workCenterInfo .work-center-wrap .list-wrap .list-item .item-text {
+  margin-right: 8px;
+  line-height: 20px;
+  flex-shrink: 0;
+}
+.workCenterInfo .work-center-wrap .list-wrap .list-item .tips-num-wrap {
+  flex-shrink: 0;
+  background-color: #E05847;
+  height: 16px;
+  line-height: 16px;
+  border-radius: 8px;
+  padding: 0 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  display: none;
+}
+.workCenterInfo .work-center-wrap .list-wrap .list-item .tips-num-wrap .tips-num {
+  font-family: PingFang SC;
+  font-size: 12px;
+  transform-origin: center;
+  font-weight: 500;
+  letter-spacing: 0px;
+  color: #fff;
+}
+.workCenterInfo .work-center-wrap .list-wrap .list-item.msg .item-icon {
+  background-image: url('../img/msg-icon.png');
+}
+.workCenterInfo .work-center-wrap .list-wrap .list-item.sp .item-icon {
+  background-image: url('../img/sp-icon.png');
+}
+.workCenterInfo .work-center-wrap .list-wrap .list-item.download .item-icon {
+  background-image: url('../img/load-icon.png');
+}
+.workCenterInfo .work-center-wrap .list-wrap .list-item.kf .item-icon {
+  background-image: url('../img/kf-icon.png');
+}
+.workCenterInfo .work-center-wrap .list-wrap .list-item:hover {
+  background-color: #F0F7FD;
+  color: #3B9AFD;
+}
+.workCenterInfo .work-center-wrap .list-wrap .list-item:hover.msg .item-icon {
+  background-image: url('../img/msg-icon-active.png');
+}
+.workCenterInfo .work-center-wrap .list-wrap .list-item:hover.sp .item-icon {
+  background-image: url('../img/sp-icon-active.png');
+}
+.workCenterInfo .work-center-wrap .list-wrap .list-item:hover.download .item-icon {
+  background-image: url('../img/load-icon-active.png');
+}
+.workCenterInfo .work-center-wrap .list-wrap .list-item:hover.kf .item-icon {
+  background-image: url('../img/kf-icon-active.png');
+}
+.workCenterInfo:hover .work-center-wrap {
+  display: block;
+}
+body > .global-tip-msg {
+  background-color: #fff;
+  padding: 14px 22px;
+  border-radius: 8px;
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999999999;
+  font-size: 14px;
+  line-height: 20px;
+  font-family: Microsoft YaHei;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 2px 12px 0px #00255933;
+}
+body > .global-tip-msg.right {
+  left: auto;
+  transform: translateX(0);
+  right: 16px;
+  animation: slideRight 0.3s ease-in-out 1;
+}
+body > .global-tip-msg .tips-icon {
+  width: 20px;
+  height: 20px;
+  background-size: 100%;
+  margin-right: 8px;
+  display: none;
+}
+body > .global-tip-msg .tips-text {
+  color: #474C59;
+}
+body > .global-tip-msg .view-detail,
+body > .global-tip-msg .download-btn {
+  color: #3A8BFF;
+  margin-left: 16px;
+  cursor: pointer;
+}
+body > .global-tip-msg.success .tips-icon {
+  background-image: url('../img/tips-success-icon.png');
+  display: block;
+}
+body > .global-tip-msg.warning .tips-icon {
+  background-image: url('../img/tips-warning-icon.png');
+  display: block;
+}
+body > .work-ani-pointer {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #DF5747;
+  position: fixed;
+  z-index: 999999999;
+}
+@keyframes slideRight {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
